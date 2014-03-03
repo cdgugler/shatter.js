@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phaser Shatter</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+<div id="voro"></div>
+<script src="../bower_components/phaser/phaser.js" type="text/javascript" charset="utf-8"></script>
+<script src="../node_modules/d3/d3.js" charset="utf-8"></script>
+<script src="../src/shatter.js" type="text/javascript" charset="utf-8"></script>
+<script src="phaser-shatter.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" charset="utf-8">
+    window.onload  = function() {
+        var game = new Phaser.Game(800, 480, Phaser.AUTO, 'voro');
+        game.state.add('Main', Voronoi.Main);
+        game.state.start('Main');
+    }
+</script>
+</body>
+</html>
