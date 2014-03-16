@@ -3,14 +3,6 @@ function Shatter (img, numPolys) {
     this.numPolys = numPolys;
     this.images = [];
 
-    // Round all vertices in a polygon
-    var cleanVertices = function (polygon) {
-        polygon.forEach(function(coordinatePair) {
-            coordinatePair[0] = Math.round(coordinatePair[0]);
-            coordinatePair[1] = Math.round(coordinatePair[1]);
-        });
-    }
-    
     // Calculate and store minimum and maximum X, Y coords in a polygon
     var calcBoundaries = function (polygon) {
             polygon.minX = img.width;
@@ -43,7 +35,7 @@ function Shatter (img, numPolys) {
 
     // Divides a rectangular area into the specified number
     // of Voronoi cells
-    var getPolys = function (width, height, numPolys) {
+    getPolys = function (width, height, numPolys) {
         var vertices = d3.range(numPolys).map(function(d) {
           return [Math.random() * width, Math.random() * height];
         });
@@ -51,7 +43,7 @@ function Shatter (img, numPolys) {
             .clipExtent([[0, 0], [width, height]]);
         var polygons = voronoi(vertices);
         // round all x and y coords and calc min, max values
-        polygons.forEach(cleanVertices);
+        polygons.forEach(Shatter.prototype.roundVertices);
         polygons.forEach(calcBoundaries);
         return polygons;
     }
@@ -111,4 +103,12 @@ function Shatter (img, numPolys) {
     var polygonList = getPolys(img.width, img.height, numPolys);
     polygonList.forEach(adjustedCoordinates);
     this.images = spliceImage(polygonList, img);
+}
+
+// Round all vertices in a polygon
+Shatter.prototype.roundVertices = function (polygon) {
+    polygon.forEach(function(coordinatePair) {
+        coordinatePair[0] = Math.round(coordinatePair[0]);
+        coordinatePair[1] = Math.round(coordinatePair[1]);
+    });
 }
