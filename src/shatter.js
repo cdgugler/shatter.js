@@ -5,6 +5,7 @@ function Shatter (img, numPolys) {
 
     // Calculate and store minimum and maximum X, Y coords in a polygon
     var calcBoundaries = function (polygon) {
+            debugger;
             polygon.minX = img.width;
             polygon.minY = img.height;
             polygon.maxX = 0;
