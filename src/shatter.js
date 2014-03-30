@@ -3,20 +3,6 @@ function Shatter (img, numPolys) {
     this.numPolys = numPolys;
     this.images = [];
 
-    // Calculate and store minimum and maximum X, Y coords in a polygon
-    var calcBoundaries = function (polygon) {
-            debugger;
-            polygon.minX = img.width;
-            polygon.minY = img.height;
-            polygon.maxX = 0;
-            polygon.maxY = 0;
-            polygon.forEach(function(coordinatePair) {
-                polygon.minX = coordinatePair[0] < polygon.minX ? coordinatePair[0] : polygon.minX; 
-                polygon.minY = coordinatePair[1] < polygon.minY ? coordinatePair[1] : polygon.minY; 
-                polygon.maxX = coordinatePair[0] > polygon.maxX ? coordinatePair[0] : polygon.maxX; 
-                polygon.maxY = coordinatePair[1] > polygon.maxY ? coordinatePair[1] : polygon.maxY; 
-            });
-    }
 
     // scale polygon coordinates
     var adjustedCoordinates = function (polygon) {
@@ -35,17 +21,14 @@ function Shatter (img, numPolys) {
     }
 
     // Divides a rectangular area into the specified number
-    // of Voronoi cells
-    getPolys = function (width, height, numPolys) {
+    // of Voronoi cells, rounds all vertices
+    var getPolys = function (width, height, numPolys) {
         var vertices = d3.range(numPolys).map(function(d) {
           return [Math.random() * width, Math.random() * height];
         });
         var voronoi = d3.geom.voronoi()
             .clipExtent([[0, 0], [width, height]]);
         var polygons = voronoi(vertices);
-        // round all x and y coords and calc min, max values
-        polygons.forEach(Shatter.prototype.roundVertices);
-        polygons.forEach(calcBoundaries);
         return polygons;
     }
 
@@ -102,6 +85,8 @@ function Shatter (img, numPolys) {
     }
 
     var polygonList = getPolys(img.width, img.height, numPolys);
+    polygonList.forEach(Shatter.prototype.roundVertices);
+    this.calcBoundaries(polygonList, this.img);
     polygonList.forEach(adjustedCoordinates);
     this.images = spliceImage(polygonList, img);
 }
@@ -111,5 +96,21 @@ Shatter.prototype.roundVertices = function (polygon) {
     polygon.forEach(function(coordinatePair) {
         coordinatePair[0] = Math.round(coordinatePair[0]);
         coordinatePair[1] = Math.round(coordinatePair[1]);
+    });
+}
+
+// Calculate and store minimum and maximum X, Y coords in a polygon
+Shatter.prototype.calcBoundaries = function (polygonList, img) {
+    polygonList.forEach(function(polygon) {
+        polygon.minX = img.width;
+        polygon.minY = img.height;
+        polygon.maxX = 0;
+        polygon.maxY = 0;
+        polygon.forEach(function(coordinatePair) {
+            polygon.minX = coordinatePair[0] < polygon.minX ? coordinatePair[0] : polygon.minX; 
+            polygon.minY = coordinatePair[1] < polygon.minY ? coordinatePair[1] : polygon.minY; 
+            polygon.maxX = coordinatePair[0] > polygon.maxX ? coordinatePair[0] : polygon.maxX; 
+            polygon.maxY = coordinatePair[1] > polygon.maxY ? coordinatePair[1] : polygon.maxY; 
+        });
     });
 }
