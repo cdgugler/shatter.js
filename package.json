@@ -1,11 +1,11 @@
 {
   "name": "shatter",
   "version": "0.0.0",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "d3": "^3.4.3",
     "grunt": "^0.4.2",
-    "grunt-smash": "^0.1.0"
+    "grunt-smash": "^0.1.0",
+    "grunt-contrib-watch": "^0.6.1"
   }
 }
