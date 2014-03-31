@@ -2,6 +2,7 @@ function Shatter (img, numPolys) {
     this.img = img;
     this.numPolys = numPolys;
     this.images = [];
+    var polygons;
 
 
     // scale polygon coordinates
@@ -22,14 +23,14 @@ function Shatter (img, numPolys) {
 
     // Splits the given image into separate segments based on
     // a list of polygons (or Voronoi cells)
-    var spliceImage = function (polygonList, img) {
+    var spliceImage = function (polygons, img) {
         imageList = [];
         var tempCanvas = document.createElement('canvas');
         tempCanvas.width = img.width;
         tempCanvas.height = img.height;
         var tempCtx = tempCanvas.getContext("2d");
         tempCtx.save();
-        polygonList.forEach(function (polygon, index, polygonList) {
+        polygons.forEach(function (polygon, index, polygons) {
             polygon.forEach(function (coordinatePair, index, polygon) {
                 if (index === 0) {
                     tempCtx.beginPath();
@@ -72,11 +73,12 @@ function Shatter (img, numPolys) {
         return imageList;
     }
 
-    var polygonList = this.getPolys(img.width, img.height, numPolys);
-    this.roundVertices(polygonList);
-    this.calcBoundaries(polygonList, this.img);
-    polygonList.forEach(adjustedCoordinates);
-    this.images = spliceImage(polygonList, img);
+    // Init shattered image
+    polygons = this.getPolys(img.width, img.height, numPolys);
+    this.roundVertices(polygons);
+    this.calcBoundaries(polygons, this.img);
+    polygons.forEach(adjustedCoordinates);
+    this.images = spliceImage(polygons, img);
 }
 
 // Divides a rectangular area into the specified number
@@ -92,8 +94,8 @@ Shatter.prototype.getPolys = function (width, height, numPolys) {
 }
 
 // Round all vertices in a polygon
-Shatter.prototype.roundVertices = function (polygonList) {
-    polygonList.forEach(function (polygon) {
+Shatter.prototype.roundVertices = function (polygons) {
+    polygons.forEach(function (polygon) {
         polygon.forEach(function (coordinatePair) {
             coordinatePair[0] = Math.round(coordinatePair[0]);
             coordinatePair[1] = Math.round(coordinatePair[1]);
@@ -102,8 +104,8 @@ Shatter.prototype.roundVertices = function (polygonList) {
 }
 
 // Calculate and store minimum and maximum X, Y coords in a polygon
-Shatter.prototype.calcBoundaries = function (polygonList, img) {
-    polygonList.forEach(function (polygon) {
+Shatter.prototype.calcBoundaries = function (polygons, img) {
+    polygons.forEach(function (polygon) {
         polygon.minX = img.width;
         polygon.minY = img.height;
         polygon.maxX = 0;
