@@ -1,14 +1,15 @@
-function Shatter (img, numPolys) {
+function Shatter (img, numPolys, scale) {
     this.img = img;
     this.numPolys = numPolys;
     this.images = [];
     var polygons;
+    var scale = scale || 1;
 
     // Init shattered image
     polygons = this.getPolys(img.width, img.height, numPolys);
     this.roundVertices(polygons);
     this.calcBoundaries(polygons, this.img);
-    this.scaleCoordinates(polygons);
+    this.scaleCoordinates(polygons, scale);
     this.images = this.spliceImage(polygons, img);
 }
 
@@ -35,10 +36,10 @@ Shatter.prototype.roundVertices = function (polygons) {
 }
 
 // scale polygon coordinates
-Shatter.prototype.scaleCoordinates = function (polygons) {
+Shatter.prototype.scaleCoordinates = function (polygons, scale) {
+    var scale = scale;
     polygons.forEach(function (polygon) {
         polygon.points = [];
-        var scale = 0.9;
         var xCenter = (polygon.maxX + polygon.minX) / 2;
         var yCenter = (polygon.maxY + polygon.minY) / 2;
         polygon.forEach(function (coordinatePair) {
