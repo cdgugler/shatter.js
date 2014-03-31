@@ -4,81 +4,12 @@ function Shatter (img, numPolys) {
     this.images = [];
     var polygons;
 
-
-    // scale polygon coordinates
-    var adjustedCoordinates = function (polygon) {
-            polygon.points = [];
-            var scale = 0.9;
-            var xCenter = (polygon.maxX + polygon.minX) / 2;
-            var yCenter = (polygon.maxY + polygon.minY) / 2;
-            polygon.forEach(function (coordinatePair) {
-                var x = coordinatePair[0] - polygon.minX;
-                var y = coordinatePair[1] - polygon.minY;
-                // scale points in for collision bounds
-                x = Math.round(scale * (x - xCenter) + xCenter);
-                y = Math.round(scale * (y - yCenter) + yCenter);
-                polygon.points.push(x, y);
-            });
-    }
-
-    // Splits the given image into separate segments based on
-    // a list of polygons (or Voronoi cells)
-    var spliceImage = function (polygons, img) {
-        imageList = [];
-        var tempCanvas = document.createElement('canvas');
-        tempCanvas.width = img.width;
-        tempCanvas.height = img.height;
-        var tempCtx = tempCanvas.getContext("2d");
-        tempCtx.save();
-        polygons.forEach(function (polygon, index, polygons) {
-            polygon.forEach(function (coordinatePair, index, polygon) {
-                if (index === 0) {
-                    tempCtx.beginPath();
-                    tempCtx.moveTo(coordinatePair[0], coordinatePair[1]);
-                    return
-                }
-                tempCtx.lineTo(coordinatePair[0], coordinatePair[1]);
-                if (index === polygon.length - 1) {
-                    // last coordinate, close polygon
-                    tempCtx.lineTo(polygon[0][0], polygon[0][1]);
-                    // create clipped canvas with polygon
-                    tempCtx.clip();
-                    // draw the original image onto the canvas
-                    tempCtx.drawImage(img, 0, 0);
-                    // save clipped image
-                    var tempBigImage = new Image();
-                    tempBigImage.src = tempCanvas.toDataURL("image/png");
-                    // now crop the image by drawing on a new canvas and saving 
-                    // that canvas
-                    var imgHeight = polygon.maxY - polygon.minY,
-                        imgWidth = polygon.maxX - polygon.minX;
-                    var cropCanvas = document.createElement('canvas');
-                    cropCanvas.width = imgWidth;
-                    cropCanvas.height = imgHeight;
-                    cropCtx = cropCanvas.getContext("2d");
-                    cropCtx.drawImage(tempBigImage, -polygon.minX, -polygon.minY);
-                    var saveImage = new Image();
-                    saveImage.src = cropCanvas.toDataURL("image/png");
-                    
-                    imageList.push([saveImage, [polygon.minX, polygon.minY], polygon.points]);
-                    tempBigImage = null, saveImage = null, cropCanvas = null; // clean up
-                    tempCtx.restore();
-                    tempCtx.clearRect(0,0,250,250);
-                    tempCtx.save();
-                    return;
-                }
-            });
-        });
-        canvas = null;
-        return imageList;
-    }
-
     // Init shattered image
     polygons = this.getPolys(img.width, img.height, numPolys);
     this.roundVertices(polygons);
     this.calcBoundaries(polygons, this.img);
-    polygons.forEach(adjustedCoordinates);
-    this.images = spliceImage(polygons, img);
+    this.scaleCoordinates(polygons);
+    this.images = this.spliceImage(polygons, img);
 }
 
 // Divides a rectangular area into the specified number
@@ -103,6 +34,24 @@ Shatter.prototype.roundVertices = function (polygons) {
     });
 }
 
+// scale polygon coordinates
+Shatter.prototype.scaleCoordinates = function (polygons) {
+    polygons.forEach(function (polygon) {
+        polygon.points = [];
+        var scale = 0.9;
+        var xCenter = (polygon.maxX + polygon.minX) / 2;
+        var yCenter = (polygon.maxY + polygon.minY) / 2;
+        polygon.forEach(function (coordinatePair) {
+            var x = coordinatePair[0] - polygon.minX;
+            var y = coordinatePair[1] - polygon.minY;
+            // scale points in for collision bounds
+            x = Math.round(scale * (x - xCenter) + xCenter);
+            y = Math.round(scale * (y - yCenter) + yCenter);
+            polygon.points.push(x, y);
+        });
+    });
+}
+
 // Calculate and store minimum and maximum X, Y coords in a polygon
 Shatter.prototype.calcBoundaries = function (polygons, img) {
     polygons.forEach(function (polygon) {
@@ -118,3 +67,56 @@ Shatter.prototype.calcBoundaries = function (polygons, img) {
         });
     });
 }
+
+// Splits the given image into separate segments based on
+// a list of polygons (or Voronoi cells)
+Shatter.prototype.spliceImage = function (polygons, img) {
+    imageList = [];
+    var tempCanvas = document.createElement('canvas');
+    tempCanvas.width = img.width;
+    tempCanvas.height = img.height;
+    var tempCtx = tempCanvas.getContext("2d");
+    tempCtx.save();
+    polygons.forEach(function (polygon) {
+        polygon.forEach(function (coordinatePair, index, polygon) {
+            if (index === 0) {
+                tempCtx.beginPath();
+                tempCtx.moveTo(coordinatePair[0], coordinatePair[1]);
+                return
+            }
+            tempCtx.lineTo(coordinatePair[0], coordinatePair[1]);
+            if (index === polygon.length - 1) {
+                // last coordinate, close polygon
+                tempCtx.lineTo(polygon[0][0], polygon[0][1]);
+                // create clipped canvas with polygon
+                tempCtx.clip();
+                // draw the original image onto the canvas
+                tempCtx.drawImage(img, 0, 0);
+                // save clipped image
+                var tempBigImage = new Image();
+                tempBigImage.src = tempCanvas.toDataURL("image/png");
+                // now crop the image by drawing on a new canvas and saving 
+                // that canvas
+                var imgHeight = polygon.maxY - polygon.minY,
+                    imgWidth = polygon.maxX - polygon.minX;
+                var cropCanvas = document.createElement('canvas');
+                cropCanvas.width = imgWidth;
+                cropCanvas.height = imgHeight;
+                cropCtx = cropCanvas.getContext("2d");
+                cropCtx.drawImage(tempBigImage, -polygon.minX, -polygon.minY);
+                var saveImage = new Image();
+                saveImage.src = cropCanvas.toDataURL("image/png");
+                
+                imageList.push([saveImage, [polygon.minX, polygon.minY], polygon.points]);
+                tempBigImage = null, saveImage = null, cropCanvas = null; // clean up
+                tempCtx.restore();
+                tempCtx.clearRect(0,0,250,250);
+                tempCtx.save();
+                return;
+            }
+        });
+    });
+    canvas = null;
+    return imageList;
+}
+
