@@ -17,8 +17,16 @@ module.exports = function(grunt) {
                 tasks: ['build'],
             },
         },
+        uglify: {
+            target: {
+                files: {
+                    'build/shatter.min.js': ['build/shatter.js']
+                },
+            },
+        },
     });
     grunt.loadNpmTasks('grunt-smash');
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.registerTask('build', ['smash']);
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.registerTask('build', ['smash', 'uglify']);
 }
