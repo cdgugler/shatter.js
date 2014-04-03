@@ -6,6 +6,7 @@ image with a [Voronoi diagram](http://en.wikipedia.org/wiki/Voronoi_diagram).
 ## Install
 
 Get dependencies:
+
     $ bower install && npm install
 
 This will install d3.js (required for Voronoi generation) and 
@@ -14,6 +15,7 @@ smash (to build custom d3.js with Voronoi specific functions only).
 ## Build
 
 Build with grunt.
+
     $ grunt build
 
 This will create three files in ./build:
