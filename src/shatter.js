@@ -1,3 +1,10 @@
+/**
+ * Creates a new Shatter object.
+ * @constructor
+ * @param {object} img - The image to shatter.
+ * @param {number} numPolys - The number to pieces (polygons) to split the image into.
+ * @param {number} scale [multiplier=1] - The amount to scale resultings pieces coordinates.
+ */
 function Shatter (img, numPolys, scale) {
     this.img = img;
     this.numPolys = numPolys;
@@ -13,8 +20,16 @@ function Shatter (img, numPolys, scale) {
     this.images = this.spliceImage(polygons, img);
 }
 
-// Divides a rectangular area into the specified number
-// of Voronoi cells, rounds all vertices
+/**
+ * Divides a rectangular area into Voronoi cells
+ * @param {number} width - Width of area
+ * @param {number} height - Height of area
+ * @param {number} numPolys - Number of Voronoi cells to split area
+ *
+ * @returns {array} polygons
+ *                  each polygon is {array} coordinatePairs
+ *                  each coordinatePair is {array} points (2)
+ */
 Shatter.prototype.getPolys = function (width, height, numPolys) {
     var vertices = d3.range(numPolys).map(function (d) {
       return [Math.random() * width, Math.random() * height];
@@ -22,10 +37,16 @@ Shatter.prototype.getPolys = function (width, height, numPolys) {
     var voronoi = d3.geom.voronoi()
         .clipExtent([[0, 0], [width, height]]);
     var polygons = voronoi(vertices);
+    console.log("Polygons is " + polygons);
     return polygons;
 }
 
-// Round all vertices in a polygon
+/**
+ * Rounds all vertices in a list of polygons
+ * @param {array} polygons - List of polygons
+ *
+ * Mutates original array
+ */
 Shatter.prototype.roundVertices = function (polygons) {
     polygons.forEach(function (polygon) {
         polygon.forEach(function (coordinatePair) {
@@ -35,7 +56,13 @@ Shatter.prototype.roundVertices = function (polygons) {
     });
 }
 
-// scale polygon coordinates
+/**
+ * Scale all coordinates in a list of polygons
+ * @param {array} polygons - List of polygons
+ * @param {number} scale - Factor to scale coordinates by.
+ *
+ * Mutates original array
+ */
 Shatter.prototype.scaleCoordinates = function (polygons, scale) {
     var scale = scale;
     polygons.forEach(function (polygon) {
