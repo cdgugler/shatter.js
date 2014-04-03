@@ -80,7 +80,14 @@ Shatter.prototype.scaleCoordinates = function (polygons, scale) {
     });
 }
 
-// Calculate and store minimum and maximum X, Y coords in a polygon
+/**
+ * Determine minimum and maximum X & Y coords of each polygon in a list of polygons
+ * @param {array} polygons - List of polygons
+ * @param {object} img - Original image
+ *
+ * Mutates original array
+ * Adds minX, minY, maxX, maxY properties to each polygon
+ */
 Shatter.prototype.calcBoundaries = function (polygons, img) {
     polygons.forEach(function (polygon) {
         polygon.minX = img.width;
@@ -96,8 +103,14 @@ Shatter.prototype.calcBoundaries = function (polygons, img) {
     });
 }
 
-// Splits the given image into separate segments based on
-// a list of polygons (or Voronoi cells)
+/**
+ * Split an image into separate segments based on list of polygons
+ * @param {array} polygons - List of polygons
+ * @param {object} img - Image to split
+ *
+ * @returns {array} imageList - {array} [{object} image, {array} [minX, minY], {array} [polygon.points]]
+ * 
+ */
 Shatter.prototype.spliceImage = function (polygons, img) {
     imageList = [];
     var tempCanvas = document.createElement('canvas');
