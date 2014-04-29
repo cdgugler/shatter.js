@@ -10,4 +10,5 @@ image.addEventListener("load", function() {
         shatter.images[i][0].style.top = shatter.images[i][1][1] + 'px';
         div[0].appendChild(shatter.images[i][0]);
     }
+    $('body').jGravity();
 }, false);
