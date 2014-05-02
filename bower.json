@@ -14,6 +14,7 @@
     "tests"
   ],
   "dependencies": {
-    "phaser": "~1.1.6"
+    "phaser": "~1.1.6",
+    "jquery": "~2.1.1"
   }
 }
