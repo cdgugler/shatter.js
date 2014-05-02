@@ -118,16 +118,21 @@ Shatter.prototype.spliceImage = function (polygons, img) {
     tempCanvas.height = img.height;
     var tempCtx = tempCanvas.getContext("2d");
     tempCtx.save();
+    // loop through each polygon
     polygons.forEach(function (polygon) {
+        // loop through each pair of coordinates
         polygon.forEach(function (coordinatePair, index, polygon) {
+            // check if first pair of coordinates and start path
             if (index === 0) {
                 tempCtx.beginPath();
                 tempCtx.moveTo(coordinatePair[0], coordinatePair[1]);
                 return
             }
+            // draw line to next coordinate
             tempCtx.lineTo(coordinatePair[0], coordinatePair[1]);
+
+            // last coordinate, close polygon
             if (index === polygon.length - 1) {
-                // last coordinate, close polygon
                 tempCtx.lineTo(polygon[0][0], polygon[0][1]);
                 // create clipped canvas with polygon
                 tempCtx.clip();
