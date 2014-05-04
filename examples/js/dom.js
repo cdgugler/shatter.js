@@ -11,10 +11,10 @@ image.addEventListener("load", function() {
     // loop through images in shatter object and insert into 
     // dom at correct position
     for (var i = 0; i < shatter.images.length; i++) {
-        shatter.images[i][0].style.position = 'absolute';
-        shatter.images[i][0].style.left = shatter.images[i][1][0] + adjustment + 'px';
-        shatter.images[i][0].style.top = shatter.images[i][1][1] + 75 + 'px';
-        div[0].appendChild(shatter.images[i][0]);
+        shatter.images[i].image.style.position = 'absolute';
+        shatter.images[i].image.style.left = shatter.images[i].x + adjustment + 'px';
+        shatter.images[i].image.style.top = shatter.images[i].y + 75 + 'px';
+        div[0].appendChild(shatter.images[i].image);
     }
 
     // wait a bit to add dom gravity
