@@ -158,7 +158,10 @@ Shatter.prototype.spliceImage = function (polygons, img) {
                 var saveImage = new Image();
                 saveImage.src = cropCanvas.toDataURL("image/png");
                 
-                imageList.push([saveImage, [polygon.minX, polygon.minY], polygon.points]);
+                imageList.push({image: saveImage,
+                                x: polygon.minX, 
+                                y: polygon.minY,
+                                points: polygon.points});
                 tempBigImage = null, saveImage = null, cropCanvas = null; // clean up
                 tempCtx.restore();
                 tempCtx.clearRect(0,0,250,250);
