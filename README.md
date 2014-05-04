@@ -3,6 +3,8 @@
 Shatter.js provides simple image shattering by dividing a given 
 image with a [Voronoi diagram](http://en.wikipedia.org/wiki/Voronoi_diagram).
 
+Uses a custom build of [D3.js](https://github.com/mbostock/d3) to generate the Voronoi diagram used to split up the given image.
+
 ## Install
 
 Get dependencies:
@@ -25,11 +27,28 @@ This will create three files in ./build:
 
 ## Documentation
 
-Workin on it.
+Include shatter.min.js in your project.
 
-## Example
+Create a new Shatter object. Pass in the image to shatter and the number of segments to split it into.
+    var image = new Image();
+    image.src = "aPictureOfSomethingCool.png";
+    var shattered = new Shatter(image, 10);
+Your new shattered object will contain images and x, y coordinates for each segment.
+shattered.images will be an array of objects (10 in this example) containing each segment and the x, y offsets.
 
-Still working on this. See phaser-shatter.html in ./examples
+Each segment (i) will contain these useful properties:
+shattered.images[i].image - The image segment
+shattered.images[i].x     - X-offset
+shattered.images[i].y     - Y-offset
+
+See the examples for more details!
+
+
+## Examples
+
+More examples and usage instructions to come. 
+
+See /examples for a DOM and Phaser.js example.
 
 ## License
 - [MIT license](LICENSE.md)

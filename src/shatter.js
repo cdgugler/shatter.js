@@ -8,11 +8,6 @@
 function Shatter (img, numPolys, scale) {
     this.img = img;
     this.numPolys = numPolys;
-    /***********************************************
-     * TODO 
-     * Images array could be better/more descriptive. An array
-     * of objects instead of an array of arrays
-     */
     this.images = [];
     var polygons;
     var scale = scale || 1;
