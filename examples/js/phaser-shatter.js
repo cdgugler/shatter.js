@@ -11,24 +11,24 @@ Voronoi.Main.prototype = {
     },
 
     create: function() {
-        var earth = new Shatter(this.game.cache._images.earth.data, 18);
+        var earth = new Shatter(this.game.cache._images.earth.data, 4);
         this.game.voronoiImages = earth.images;
         var that = this;
         sprites = this.game.add.group();
 
         this.game.voronoiImages.forEach(function (el, index, arr) {
             var key = 'earth' + index;
-            that.game.cache.addImage(key, null, el[0]);
-            var sprite = sprites.create(el[1][0], el[1][1], key);
+            that.game.cache.addImage(key, null, el.image);
+            var sprite = sprites.create(el.x, el.y, key);
             sprite.body.velocity.x = that.game.rnd.integerInRange(-100, 900);
             sprite.body.velocity.y = that.game.rnd.integerInRange(-500, 900);
-            sprite.body.setPolygon(el[2]);
+            sprite.body.setPolygon(el.points);
         });
 
         this.game.cache.addImage('earthseg', null, this.game.voronoiImages[0][0]);
         this.game.input.maxPointers = 1;
         this.game.stage.disableVisibilityChange = true;
-        this.game.physics.gravity.y = 500;
+        this.game.physics.gravity.y = 1500;
 
         sprites.setAll('body.collideWorldBounds', true);
         sprites.setAll('body.bounce.y', 0.5);
