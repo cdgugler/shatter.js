@@ -30,16 +30,18 @@ This will create three files in ./build:
 Include shatter.min.js in your project.
 
 Create a new Shatter object. Pass in the image to shatter and the number of segments to split it into.
+
     var image = new Image();
     image.src = "aPictureOfSomethingCool.png";
     var shattered = new Shatter(image, 10);
+
 Your new shattered object will contain images and x, y coordinates for each segment.
 shattered.images will be an array of objects (10 in this example) containing each segment and the x, y offsets.
 
 Each segment (i) will contain these useful properties:
-shattered.images[i].image - The image segment
-shattered.images[i].x     - X-offset
-shattered.images[i].y     - Y-offset
+- shattered.images[i].image - The image segment
+- shattered.images[i].x     - X-offset
+- shattered.images[i].y     - Y-offset
 
 See the examples for more details!
 
