@@ -1,6 +1,6 @@
 {
   "name": "Shatter.js",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "main": "./build/shatter.js",
   "description": "Library to shatter images.",
   "homepage": "http://cdgugler.github.io/shatter.js/",
