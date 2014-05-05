@@ -18,7 +18,7 @@ function Shatter (img, numPolys, scale) {
     this.calcBoundaries(polygons, this.img);
     this.scaleCoordinates(polygons, scale);
     this.images = this.spliceImage(polygons, img);
-}
+};
 
 /**
  * Divides a rectangular area into Voronoi cells
@@ -39,7 +39,7 @@ Shatter.prototype.getPolys = function (width, height, numPolys) {
     var polygons = voronoi(vertices);
     console.log("Polygons is " + polygons);
     return polygons;
-}
+};
 
 /**
  * Rounds all vertices in a list of polygons
@@ -54,7 +54,7 @@ Shatter.prototype.roundVertices = function (polygons) {
             coordinatePair[1] = Math.round(coordinatePair[1]);
         });
     });
-}
+};
 
 /**
  * Scale all coordinates in a list of polygons
@@ -78,7 +78,7 @@ Shatter.prototype.scaleCoordinates = function (polygons, scale) {
             polygon.points.push(x, y);
         });
     });
-}
+};
 
 /**
  * Determine minimum and maximum X & Y coords of each polygon in a list of polygons
@@ -101,7 +101,7 @@ Shatter.prototype.calcBoundaries = function (polygons, img) {
             polygon.maxY = coordinatePair[1] > polygon.maxY ? coordinatePair[1] : polygon.maxY; 
         });
     });
-}
+};
 
 /**
  * Split an image into separate segments based on list of polygons
@@ -120,52 +120,57 @@ Shatter.prototype.spliceImage = function (polygons, img) {
     tempCtx.save();
     // loop through each polygon
     polygons.forEach(function (polygon) {
-        // loop through each pair of coordinates
-        polygon.forEach(function (coordinatePair, index, polygon) {
-            // check if first pair of coordinates and start path
-            if (index === 0) {
-                tempCtx.beginPath();
-                tempCtx.moveTo(coordinatePair[0], coordinatePair[1]);
-                return
-            }
-            // draw line to next coordinate
-            tempCtx.lineTo(coordinatePair[0], coordinatePair[1]);
-
-            // last coordinate, close polygon
-            if (index === polygon.length - 1) {
-                tempCtx.lineTo(polygon[0][0], polygon[0][1]);
-                // create clipped canvas with polygon
-                tempCtx.clip();
-                // draw the original image onto the canvas
-                tempCtx.drawImage(img, 0, 0);
-                // save clipped image
-                var tempBigImage = new Image();
-                tempBigImage.src = tempCanvas.toDataURL("image/png");
-                // now crop the image by drawing on a new canvas and saving 
-                // that canvas
-                var imgHeight = polygon.maxY - polygon.minY,
-                    imgWidth = polygon.maxX - polygon.minX;
-                var cropCanvas = document.createElement('canvas');
-                cropCanvas.width = imgWidth;
-                cropCanvas.height = imgHeight;
-                cropCtx = cropCanvas.getContext("2d");
-                cropCtx.drawImage(tempBigImage, -polygon.minX, -polygon.minY);
-                var saveImage = new Image();
-                saveImage.src = cropCanvas.toDataURL("image/png");
-                
-                imageList.push({image: saveImage,
-                                x: polygon.minX, 
-                                y: polygon.minY,
-                                points: polygon.points});
-                tempBigImage = null, saveImage = null, cropCanvas = null; // clean up
-                tempCtx.restore();
-                tempCtx.clearRect(0,0,250,250);
-                tempCtx.save();
-                return;
-            }
-        });
+        // Draw clipping path for the current polygon on the 2d context
+        Shatter.prototype.drawClippingPath(polygon, tempCtx);
+        
+        // draw the original image onto the canvas
+        tempCtx.drawImage(img, 0, 0);
+        // save clipped image
+        var tempBigImage = new Image();
+        tempBigImage.src = tempCanvas.toDataURL("image/png");
+        // now crop the image by drawing on a new canvas and saving 
+        // that canvas
+        var imgHeight = polygon.maxY - polygon.minY,
+            imgWidth = polygon.maxX - polygon.minX;
+        var cropCanvas = document.createElement('canvas');
+        cropCanvas.width = imgWidth;
+        cropCanvas.height = imgHeight;
+        cropCtx = cropCanvas.getContext("2d");
+        cropCtx.drawImage(tempBigImage, -polygon.minX, -polygon.minY);
+        var saveImage = new Image();
+        saveImage.src = cropCanvas.toDataURL("image/png");
+        
+        imageList.push({image: saveImage,
+                        x: polygon.minX, 
+                        y: polygon.minY,
+                        points: polygon.points});
+        tempBigImage = null, saveImage = null, cropCanvas = null; // clean up
+        tempCtx.restore();
+        tempCtx.clearRect(0,0,250,250);
+        tempCtx.save();
+        return;
     });
     canvas = null;
     return imageList;
-}
+};
 
+Shatter.prototype.drawClippingPath = function(polygon, ctx) {
+    // loop through each pair of coordinates
+    polygon.forEach(function (coordinatePair, index, polygon) {
+        // check if first pair of coordinates and start path
+        if (index === 0) {
+            ctx.beginPath();
+            ctx.moveTo(coordinatePair[0], coordinatePair[1]);
+            return
+        }
+        // draw line to next coordinate
+        ctx.lineTo(coordinatePair[0], coordinatePair[1]);
+
+        // last coordinate, close polygon
+        if (index === polygon.length - 1) {
+            ctx.lineTo(polygon[0][0], polygon[0][1]);
+            // create clipped canvas with polygon
+            ctx.clip();
+        }
+    });
+};
