@@ -1,9 +1,13 @@
 {
   "name": "Shatter.js",
   "version": "0.1.0",
-  "authors": [
-    "Cory Gugler <cory@addlime.com>"
-  ],
+  "main": "./build/shatter.js",
+  "description": "Library to shatter images.",
+  "homepage": "http://cdgugler.github.io/shatter.js/",
+  "author": {
+    "name": "Cory Gugler",
+    "web": "http://www.addlime.com"
+  },
   "license": "MIT",
   "ignore": [
     "**/.*",
