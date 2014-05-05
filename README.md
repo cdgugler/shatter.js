@@ -48,9 +48,7 @@ See the examples for more details!
 
 ## Examples
 
-More examples and usage instructions to come. 
-
-See /examples for a DOM and Phaser.js example.
+See the [project page](http://cdgugler.github.io/shatter.js/).
 
 ## License
 - [MIT license](LICENSE.md)
