@@ -121,7 +121,9 @@ Shatter.prototype.spliceImage = function (polygons, img) {
     // loop through each polygon
     polygons.forEach(function (polygon) {
         // Draw clipping path for the current polygon on the 2d context
-        Shatter.prototype.drawClippingPath(polygon, tempCtx);
+        Shatter.prototype.drawPath(polygon, tempCtx);
+        // create clipped canvas with polygon
+        ctx.clip();
         
         // draw the original image onto the canvas
         tempCtx.drawImage(img, 0, 0);
@@ -154,7 +156,13 @@ Shatter.prototype.spliceImage = function (polygons, img) {
     return imageList;
 };
 
-Shatter.prototype.drawClippingPath = function(polygon, ctx) {
+/**
+ * Draw a polygon
+ * @param {array} polygon - Any array of points to draw
+ * @param {object} ctx - The canvas 2d drawing context to draw to
+ *
+ */
+Shatter.prototype.drawPath = function(polygon, ctx) {
     // loop through each pair of coordinates
     polygon.forEach(function (coordinatePair, index, polygon) {
         // check if first pair of coordinates and start path
@@ -169,8 +177,6 @@ Shatter.prototype.drawClippingPath = function(polygon, ctx) {
         // last coordinate, close polygon
         if (index === polygon.length - 1) {
             ctx.lineTo(polygon[0][0], polygon[0][1]);
-            // create clipped canvas with polygon
-            ctx.clip();
         }
     });
 };
