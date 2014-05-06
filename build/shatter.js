@@ -1,10 +1,8 @@
 !function(){
-  var d3 = {version: "3.4.4"}; // semver
-d3.ascending = d3_ascending;
-
-function d3_ascending(a, b) {
+  var d3 = {version: "3.4.3"}; // semver
+d3.ascending = function(a, b) {
   return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
-}
+};
 d3.descending = function(a, b) {
   return b < a ? -1 : b > a ? 1 : b >= a ? 0 : NaN;
 };
@@ -100,17 +98,16 @@ d3.quantile = function(values, p) {
 d3.median = function(array, f) {
   if (arguments.length > 1) array = array.map(f);
   array = array.filter(d3_number);
-  return array.length ? d3.quantile(array.sort(d3_ascending), .5) : undefined;
+  return array.length ? d3.quantile(array.sort(d3.ascending), .5) : undefined;
 };
-
-function d3_bisector(compare) {
+d3.bisector = function(f) {
   return {
     left: function(a, x, lo, hi) {
       if (arguments.length < 3) lo = 0;
       if (arguments.length < 4) hi = a.length;
       while (lo < hi) {
         var mid = lo + hi >>> 1;
-        if (compare(a[mid], x) < 0) lo = mid + 1;
+        if (f.call(a, a[mid], mid) < x) lo = mid + 1;
         else hi = mid;
       }
       return lo;
@@ -120,23 +117,17 @@ function d3_bisector(compare) {
       if (arguments.length < 4) hi = a.length;
       while (lo < hi) {
         var mid = lo + hi >>> 1;
-        if (compare(a[mid], x) > 0) hi = mid;
+        if (x < f.call(a, a[mid], mid)) hi = mid;
         else lo = mid + 1;
       }
       return lo;
     }
   };
-}
-
-var d3_bisect = d3_bisector(d3_ascending);
-d3.bisectLeft = d3_bisect.left;
-d3.bisect = d3.bisectRight = d3_bisect.right;
-
-d3.bisector = function(f) {
-  return d3_bisector(f.length === 1
-      ? function(d, x) { return d3_ascending(f(d), x); }
-      : f);
 };
+
+var d3_bisector = d3.bisector(function(d) { return d; });
+d3.bisectLeft = d3_bisector.left;
+d3.bisect = d3.bisectRight = d3_bisector.right;
 d3.shuffle = function(array) {
   var m = array.length, t, i;
   while (m) {
@@ -1528,7 +1519,9 @@ Shatter.prototype.spliceImage = function (polygons, img) {
     // loop through each polygon
     polygons.forEach(function (polygon) {
         // Draw clipping path for the current polygon on the 2d context
-        Shatter.prototype.drawClippingPath(polygon, tempCtx);
+        Shatter.prototype.drawPath(polygon, tempCtx);
+        // create clipped canvas with polygon
+        tempCtx.clip();
         
         // draw the original image onto the canvas
         tempCtx.drawImage(img, 0, 0);
@@ -1561,7 +1554,13 @@ Shatter.prototype.spliceImage = function (polygons, img) {
     return imageList;
 };
 
-Shatter.prototype.drawClippingPath = function(polygon, ctx) {
+/**
+ * Draw a path
+ * @param {array} polygon - Any array of points to draw
+ * @param {object} ctx - The canvas 2d drawing context to draw to
+ *
+ */
+Shatter.prototype.drawPath = function(polygon, ctx) {
     // loop through each pair of coordinates
     polygon.forEach(function (coordinatePair, index, polygon) {
         // check if first pair of coordinates and start path
@@ -1576,8 +1575,6 @@ Shatter.prototype.drawClippingPath = function(polygon, ctx) {
         // last coordinate, close polygon
         if (index === polygon.length - 1) {
             ctx.lineTo(polygon[0][0], polygon[0][1]);
-            // create clipped canvas with polygon
-            ctx.clip();
         }
     });
 };

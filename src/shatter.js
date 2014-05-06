@@ -123,7 +123,7 @@ Shatter.prototype.spliceImage = function (polygons, img) {
         // Draw clipping path for the current polygon on the 2d context
         Shatter.prototype.drawPath(polygon, tempCtx);
         // create clipped canvas with polygon
-        ctx.clip();
+        tempCtx.clip();
         
         // draw the original image onto the canvas
         tempCtx.drawImage(img, 0, 0);
@@ -157,7 +157,7 @@ Shatter.prototype.spliceImage = function (polygons, img) {
 };
 
 /**
- * Draw a polygon
+ * Draw a path
  * @param {array} polygon - Any array of points to draw
  * @param {object} ctx - The canvas 2d drawing context to draw to
  *
