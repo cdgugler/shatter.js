@@ -1444,7 +1444,6 @@ Shatter.prototype.getPolys = function (width, height, numPolys) {
     var voronoi = d3.geom.voronoi()
         .clipExtent([[0, 0], [width, height]]);
     var polygons = voronoi(vertices);
-    console.log("Polygons is " + polygons);
     return polygons;
 };
 
