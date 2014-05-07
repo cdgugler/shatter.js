@@ -176,6 +176,13 @@ Shatter.prototype.getClippedImage = function(polygon, ctx, tempCanvas, img) {
     return tempBigImage;
 };
 
+/**
+ * Crop an image using the given polygon
+ * @param {array} polygon - Polygon object with min and max coordinate values
+ * @param {object} img - An image that has been clipped to only show the desired part
+ *
+ * @returns {object} - The cropped image
+ */
 Shatter.prototype.getCroppedImage = function (polygon, tempBigImage) {
         // now crop the image by drawing on a new canvas and saving it
         var imgHeight = polygon.maxY - polygon.minY,
