@@ -26,6 +26,6 @@ image.addEventListener("load", function() {
             depth: 5,
             drag: true
         });
-    }, 1000);
+    }, 100);
 
 }, false);
