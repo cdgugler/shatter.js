@@ -113,40 +113,24 @@ Shatter.prototype.calcBoundaries = function (polygons, img) {
  */
 Shatter.prototype.spliceImage = function (polygons, img) {
     imageList = [];
+
     var tempCanvas = document.createElement('canvas');
     tempCanvas.width = img.width;
     tempCanvas.height = img.height;
     var tempCtx = tempCanvas.getContext("2d");
     tempCtx.save();
+
     // loop through each polygon
     polygons.forEach(function (polygon) {
         // Draw clipping path for the current polygon on the 2d context
-        Shatter.prototype.drawPath(polygon, tempCtx);
-        // create clipped canvas with polygon
-        tempCtx.clip();
+        var tempBigImage = Shatter.prototype.getClippedImage(polygon, tempCtx, tempCanvas, img);
+        var croppedImage = Shatter.prototype.getCroppedImage(polygon, tempBigImage);
         
-        // draw the original image onto the canvas
-        tempCtx.drawImage(img, 0, 0);
-        // save clipped image
-        var tempBigImage = new Image();
-        tempBigImage.src = tempCanvas.toDataURL("image/png");
-        // now crop the image by drawing on a new canvas and saving 
-        // that canvas
-        var imgHeight = polygon.maxY - polygon.minY,
-            imgWidth = polygon.maxX - polygon.minX;
-        var cropCanvas = document.createElement('canvas');
-        cropCanvas.width = imgWidth;
-        cropCanvas.height = imgHeight;
-        cropCtx = cropCanvas.getContext("2d");
-        cropCtx.drawImage(tempBigImage, -polygon.minX, -polygon.minY);
-        var saveImage = new Image();
-        saveImage.src = cropCanvas.toDataURL("image/png");
-        
-        imageList.push({image: saveImage,
+        imageList.push({image: croppedImage,
                         x: polygon.minX, 
                         y: polygon.minY,
                         points: polygon.points});
-        tempBigImage = null, saveImage = null, cropCanvas = null; // clean up
+        croppedImage = null; // clean up
         tempCtx.restore();
         tempCtx.clearRect(0,0,250,250);
         tempCtx.save();
@@ -160,9 +144,11 @@ Shatter.prototype.spliceImage = function (polygons, img) {
  * Draw a path
  * @param {array} polygon - Any array of points to draw
  * @param {object} ctx - The canvas 2d drawing context to draw to
+ * @param {object} img - The original image
  *
+ * @returns {object} - The clipped image
  */
-Shatter.prototype.drawPath = function(polygon, ctx) {
+Shatter.prototype.getClippedImage = function(polygon, ctx, tempCanvas, img) {
     // loop through each pair of coordinates
     polygon.forEach(function (coordinatePair, index, polygon) {
         // check if first pair of coordinates and start path
@@ -179,4 +165,29 @@ Shatter.prototype.drawPath = function(polygon, ctx) {
             ctx.lineTo(polygon[0][0], polygon[0][1]);
         }
     });
+    // create clipped canvas with polygon
+    ctx.clip();
+    // draw the original image onto the canvas
+    ctx.drawImage(img, 0, 0);
+    // save clipped image
+    var tempBigImage = new Image();
+    tempBigImage.src = tempCanvas.toDataURL("image/png");
+
+    return tempBigImage;
+};
+
+Shatter.prototype.getCroppedImage = function (polygon, tempBigImage) {
+        // now crop the image by drawing on a new canvas and saving it
+        var imgHeight = polygon.maxY - polygon.minY,
+            imgWidth = polygon.maxX - polygon.minX;
+        var cropCanvas = document.createElement('canvas');
+        cropCanvas.width = imgWidth;
+        cropCanvas.height = imgHeight;
+        cropCtx = cropCanvas.getContext("2d");
+        cropCtx.drawImage(tempBigImage, -polygon.minX, -polygon.minY);
+        var saveImage = new Image();
+        saveImage.src = cropCanvas.toDataURL("image/png");
+        cropCanvas = null;
+
+        return saveImage;
 };

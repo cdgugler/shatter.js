@@ -1,8 +1,10 @@
 !function(){
-  var d3 = {version: "3.4.3"}; // semver
-d3.ascending = function(a, b) {
+  var d3 = {version: "3.4.6"}; // semver
+d3.ascending = d3_ascending;
+
+function d3_ascending(a, b) {
   return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
-};
+}
 d3.descending = function(a, b) {
   return b < a ? -1 : b > a ? 1 : b >= a ? 0 : NaN;
 };
@@ -74,17 +76,17 @@ function d3_number(x) {
 }
 
 d3.mean = function(array, f) {
-  var n = array.length,
+  var s = 0,
+      n = array.length,
       a,
-      m = 0,
       i = -1,
-      j = 0;
+      j = n;
   if (arguments.length === 1) {
-    while (++i < n) if (d3_number(a = array[i])) m += (a - m) / ++j;
+    while (++i < n) if (d3_number(a = array[i])) s += a; else --j;
   } else {
-    while (++i < n) if (d3_number(a = f.call(array, array[i], i))) m += (a - m) / ++j;
+    while (++i < n) if (d3_number(a = f.call(array, array[i], i))) s += a; else --j;
   }
-  return j ? m : undefined;
+  return j ? s / j : undefined;
 };
 // R-7 per <http://en.wikipedia.org/wiki/Quantile>
 d3.quantile = function(values, p) {
@@ -98,16 +100,17 @@ d3.quantile = function(values, p) {
 d3.median = function(array, f) {
   if (arguments.length > 1) array = array.map(f);
   array = array.filter(d3_number);
-  return array.length ? d3.quantile(array.sort(d3.ascending), .5) : undefined;
+  return array.length ? d3.quantile(array.sort(d3_ascending), .5) : undefined;
 };
-d3.bisector = function(f) {
+
+function d3_bisector(compare) {
   return {
     left: function(a, x, lo, hi) {
       if (arguments.length < 3) lo = 0;
       if (arguments.length < 4) hi = a.length;
       while (lo < hi) {
         var mid = lo + hi >>> 1;
-        if (f.call(a, a[mid], mid) < x) lo = mid + 1;
+        if (compare(a[mid], x) < 0) lo = mid + 1;
         else hi = mid;
       }
       return lo;
@@ -117,17 +120,23 @@ d3.bisector = function(f) {
       if (arguments.length < 4) hi = a.length;
       while (lo < hi) {
         var mid = lo + hi >>> 1;
-        if (x < f.call(a, a[mid], mid)) hi = mid;
+        if (compare(a[mid], x) > 0) hi = mid;
         else lo = mid + 1;
       }
       return lo;
     }
   };
-};
+}
 
-var d3_bisector = d3.bisector(function(d) { return d; });
-d3.bisectLeft = d3_bisector.left;
-d3.bisect = d3.bisectRight = d3_bisector.right;
+var d3_bisect = d3_bisector(d3_ascending);
+d3.bisectLeft = d3_bisect.left;
+d3.bisect = d3.bisectRight = d3_bisect.right;
+
+d3.bisector = function(f) {
+  return d3_bisector(f.length === 1
+      ? function(d, x) { return d3_ascending(f(d), x); }
+      : f);
+};
 d3.shuffle = function(array) {
   var m = array.length, t, i;
   while (m) {

@@ -1,8 +1,10 @@
 !function(){
-  var d3 = {version: "3.4.3"}; // semver
-d3.ascending = function(a, b) {
+  var d3 = {version: "3.4.6"}; // semver
+d3.ascending = d3_ascending;
+
+function d3_ascending(a, b) {
   return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
-};
+}
 d3.descending = function(a, b) {
   return b < a ? -1 : b > a ? 1 : b >= a ? 0 : NaN;
 };
@@ -74,17 +76,17 @@ function d3_number(x) {
 }
 
 d3.mean = function(array, f) {
-  var n = array.length,
+  var s = 0,
+      n = array.length,
       a,
-      m = 0,
       i = -1,
-      j = 0;
+      j = n;
   if (arguments.length === 1) {
-    while (++i < n) if (d3_number(a = array[i])) m += (a - m) / ++j;
+    while (++i < n) if (d3_number(a = array[i])) s += a; else --j;
   } else {
-    while (++i < n) if (d3_number(a = f.call(array, array[i], i))) m += (a - m) / ++j;
+    while (++i < n) if (d3_number(a = f.call(array, array[i], i))) s += a; else --j;
   }
-  return j ? m : undefined;
+  return j ? s / j : undefined;
 };
 // R-7 per <http://en.wikipedia.org/wiki/Quantile>
 d3.quantile = function(values, p) {
@@ -98,16 +100,17 @@ d3.quantile = function(values, p) {
 d3.median = function(array, f) {
   if (arguments.length > 1) array = array.map(f);
   array = array.filter(d3_number);
-  return array.length ? d3.quantile(array.sort(d3.ascending), .5) : undefined;
+  return array.length ? d3.quantile(array.sort(d3_ascending), .5) : undefined;
 };
-d3.bisector = function(f) {
+
+function d3_bisector(compare) {
   return {
     left: function(a, x, lo, hi) {
       if (arguments.length < 3) lo = 0;
       if (arguments.length < 4) hi = a.length;
       while (lo < hi) {
         var mid = lo + hi >>> 1;
-        if (f.call(a, a[mid], mid) < x) lo = mid + 1;
+        if (compare(a[mid], x) < 0) lo = mid + 1;
         else hi = mid;
       }
       return lo;
@@ -117,17 +120,23 @@ d3.bisector = function(f) {
       if (arguments.length < 4) hi = a.length;
       while (lo < hi) {
         var mid = lo + hi >>> 1;
-        if (x < f.call(a, a[mid], mid)) hi = mid;
+        if (compare(a[mid], x) > 0) hi = mid;
         else lo = mid + 1;
       }
       return lo;
     }
   };
-};
+}
 
-var d3_bisector = d3.bisector(function(d) { return d; });
-d3.bisectLeft = d3_bisector.left;
-d3.bisect = d3.bisectRight = d3_bisector.right;
+var d3_bisect = d3_bisector(d3_ascending);
+d3.bisectLeft = d3_bisect.left;
+d3.bisect = d3.bisectRight = d3_bisect.right;
+
+d3.bisector = function(f) {
+  return d3_bisector(f.length === 1
+      ? function(d, x) { return d3_ascending(f(d), x); }
+      : f);
+};
 d3.shuffle = function(array) {
   var m = array.length, t, i;
   while (m) {
@@ -1511,40 +1520,24 @@ Shatter.prototype.calcBoundaries = function (polygons, img) {
  */
 Shatter.prototype.spliceImage = function (polygons, img) {
     imageList = [];
+
     var tempCanvas = document.createElement('canvas');
     tempCanvas.width = img.width;
     tempCanvas.height = img.height;
     var tempCtx = tempCanvas.getContext("2d");
     tempCtx.save();
+
     // loop through each polygon
     polygons.forEach(function (polygon) {
         // Draw clipping path for the current polygon on the 2d context
-        Shatter.prototype.drawPath(polygon, tempCtx);
-        // create clipped canvas with polygon
-        tempCtx.clip();
+        var tempBigImage = Shatter.prototype.getClippedImage(polygon, tempCtx, tempCanvas, img);
+        var croppedImage = Shatter.prototype.getCroppedImage(polygon, tempBigImage);
         
-        // draw the original image onto the canvas
-        tempCtx.drawImage(img, 0, 0);
-        // save clipped image
-        var tempBigImage = new Image();
-        tempBigImage.src = tempCanvas.toDataURL("image/png");
-        // now crop the image by drawing on a new canvas and saving 
-        // that canvas
-        var imgHeight = polygon.maxY - polygon.minY,
-            imgWidth = polygon.maxX - polygon.minX;
-        var cropCanvas = document.createElement('canvas');
-        cropCanvas.width = imgWidth;
-        cropCanvas.height = imgHeight;
-        cropCtx = cropCanvas.getContext("2d");
-        cropCtx.drawImage(tempBigImage, -polygon.minX, -polygon.minY);
-        var saveImage = new Image();
-        saveImage.src = cropCanvas.toDataURL("image/png");
-        
-        imageList.push({image: saveImage,
+        imageList.push({image: croppedImage,
                         x: polygon.minX, 
                         y: polygon.minY,
                         points: polygon.points});
-        tempBigImage = null, saveImage = null, cropCanvas = null; // clean up
+        croppedImage = null; // clean up
         tempCtx.restore();
         tempCtx.clearRect(0,0,250,250);
         tempCtx.save();
@@ -1558,9 +1551,11 @@ Shatter.prototype.spliceImage = function (polygons, img) {
  * Draw a path
  * @param {array} polygon - Any array of points to draw
  * @param {object} ctx - The canvas 2d drawing context to draw to
+ * @param {object} img - The original image
  *
+ * @returns {object} - The clipped image
  */
-Shatter.prototype.drawPath = function(polygon, ctx) {
+Shatter.prototype.getClippedImage = function(polygon, ctx, tempCanvas, img) {
     // loop through each pair of coordinates
     polygon.forEach(function (coordinatePair, index, polygon) {
         // check if first pair of coordinates and start path
@@ -1577,4 +1572,29 @@ Shatter.prototype.drawPath = function(polygon, ctx) {
             ctx.lineTo(polygon[0][0], polygon[0][1]);
         }
     });
+    // create clipped canvas with polygon
+    ctx.clip();
+    // draw the original image onto the canvas
+    ctx.drawImage(img, 0, 0);
+    // save clipped image
+    var tempBigImage = new Image();
+    tempBigImage.src = tempCanvas.toDataURL("image/png");
+
+    return tempBigImage;
+};
+
+Shatter.prototype.getCroppedImage = function (polygon, tempBigImage) {
+        // now crop the image by drawing on a new canvas and saving it
+        var imgHeight = polygon.maxY - polygon.minY,
+            imgWidth = polygon.maxX - polygon.minX;
+        var cropCanvas = document.createElement('canvas');
+        cropCanvas.width = imgWidth;
+        cropCanvas.height = imgHeight;
+        cropCtx = cropCanvas.getContext("2d");
+        cropCtx.drawImage(tempBigImage, -polygon.minX, -polygon.minY);
+        var saveImage = new Image();
+        saveImage.src = cropCanvas.toDataURL("image/png");
+        cropCanvas = null;
+
+        return saveImage;
 };
