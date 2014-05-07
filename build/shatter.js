@@ -1548,7 +1548,7 @@ Shatter.prototype.spliceImage = function (polygons, img) {
 };
 
 /**
- * Draw a path
+ * Draw an image clipped to the provided polygon coordinates
  * @param {array} polygon - Any array of points to draw
  * @param {object} ctx - The canvas 2d drawing context to draw to
  * @param {object} img - The original image
