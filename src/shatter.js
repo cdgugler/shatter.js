@@ -113,6 +113,7 @@ Shatter.prototype.calcBoundaries = function (polygons, img) {
 Shatter.prototype.spliceImage = function (polygons, img) {
     imageList = [];
 
+    // create a temporary canvas so we can reuse it for each polygon
     var tempCanvas = document.createElement('canvas');
     tempCanvas.width = img.width;
     tempCanvas.height = img.height;
@@ -141,7 +142,7 @@ Shatter.prototype.spliceImage = function (polygons, img) {
 
 /**
  * Draw an image clipped to the provided polygon coordinates
- * @param {array} polygon - Any array of points to draw
+ * @param {object} polygon - An object containing points and min and max vals
  * @param {object} ctx - The canvas 2d drawing context to draw to
  * @param {object} img - The original image
  *
@@ -177,7 +178,7 @@ Shatter.prototype.getClippedImage = function(polygon, ctx, tempCanvas, img) {
 
 /**
  * Crop an image using the given polygon
- * @param {array} polygon - Polygon object with min and max coordinate values
+ * @param {object} polygon - An object containing points and min and max vals
  * @param {object} img - An image that has been clipped to only show the desired part
  *
  * @returns {object} - The cropped image
