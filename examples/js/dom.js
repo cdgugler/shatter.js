@@ -7,7 +7,7 @@ $('#numPieces').click();
 // create shatter object after image has loaded
 image.addEventListener("load", function() {
     var div = document.querySelectorAll('.shatter');
-    var shatter = new Shatter(image, 14, 1.5);
+    var shatter = new Shatter(image, 10);
 
     // loop through images in shatter object and insert into 
     // dom at correct position
@@ -27,8 +27,8 @@ image.addEventListener("load", function() {
     // Make new shatter object
     $('.new-shatter').on('click', function() {
         var numPieces = $('#numPieces').val();
-        // 4 pieces if none specified
-        var shatter = new Shatter(image, numPieces || 4, 1.5);
+        // 10 pieces if none specified
+        var shatter = new Shatter(image, numPieces || 10);
 
         placeShatter(shatter, div[0]);
         // clear out the input, otherwise the input box becomes unresponsive
