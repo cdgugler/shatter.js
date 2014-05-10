@@ -1,4 +1,11 @@
 /**
+ * Shatter.js: JavaScript image shattering
+ * @version 0.1.2
+ * @license MIT License https://github.com/cdgugler/shatter.js/raw/dev/LICENSE.md
+ * @author Cory Gugler - cory@addlime.com
+ */
+
+/**
  * Creates a new Shatter object.
  * @constructor
  * @param {object} img - The image to shatter.
