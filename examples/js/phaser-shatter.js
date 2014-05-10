@@ -11,26 +11,29 @@ Voronoi.Main.prototype = {
     },
 
     create: function() {
+        var game = this.game;
+        game.physics.startSystem(Phaser.Physics.ARCADE);
         var earth = new Shatter(this.game.cache._images.earth.data, 8);
         var that = this;
         var middleX = this.game.width / 2 - this.game.cache.getImage('earth').width / 2;
 
-        this.game.voronoiImages = earth.images;
+        game.voronoiImages = earth.images;
         sprites = this.game.add.group();
 
         this.game.voronoiImages.forEach(function (el, index, arr) {
             var key = 'earth' + index;
             that.game.cache.addImage(key, null, el.image);
             var sprite = sprites.create(el.x + middleX, el.y, key);
+            game.physics.arcade.enable(sprite);
             sprite.body.velocity.x = that.game.rnd.integerInRange(200, 900);
             sprite.body.velocity.y = that.game.rnd.integerInRange(-500, 900);
-            sprite.body.setPolygon(el.points);
+            // sprite.body.setPolygon(el.points);
         });
 
         this.game.cache.addImage('earthseg', null, this.game.voronoiImages[0].image);
         this.game.input.maxPointers = 1;
         this.game.stage.disableVisibilityChange = true;
-        this.game.physics.gravity.y = 1500;
+        this.game.physics.arcade.gravity.y = 1500;
 
         sprites.setAll('body.collideWorldBounds', true);
         sprites.setAll('body.bounce.y', 0.5);
@@ -52,6 +55,6 @@ Voronoi.Main.prototype = {
     },
 
     update: function() {
-        this.game.physics.collide(sprites);
+        this.game.physics.arcade.collide(sprites);
     }
 }
