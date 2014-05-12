@@ -38,9 +38,20 @@ image.addEventListener("load", function() {
         // clear out the input, otherwise the input box becomes unresponsive
         $('#numPieces').val('');
 
-        // TODO
-    // figure out why it freaks out on first new shatter without a short delay before calling jGravity.
-        window.setTimeout(function() {
+        if (!document.getElementsByClassName('shatter-check')[0].checked) {
+            // TODO
+            // figure out why it freaks out on first new shatter without a short delay before calling jGravity.
+            window.setTimeout(function() {
+                $('.container').jGravity({
+                    target: '.shatter img',
+                    ignoreClass: 'ignore',
+                    weight: 25,
+                    depth: 5,
+                    drag: true
+                });
+            }, 100);
+        }
+        $('.shatter img').click(function() {
             $('.container').jGravity({
                 target: '.shatter img',
                 ignoreClass: 'ignore',
@@ -48,7 +59,8 @@ image.addEventListener("load", function() {
                 depth: 5,
                 drag: true
             });
-        }, 100);
+            $('.shatter img').off('click');
+        });
     });
 }, false);
 
@@ -69,12 +81,12 @@ $('.remove-all').on('click', function() {
  * @param {object} domElement - The dom element to append images to
  */
 function placeShatter (shatter, domElement) {
-        // adjustment to center image on screen
-        var adjustment = (window.innerWidth / 2) - image.width / 2;
-        for (var i = 0; i < shatter.images.length; i++) {
-            shatter.images[i].image.style.position = 'absolute';
-            shatter.images[i].image.style.left = shatter.images[i].x + adjustment + 'px';
-            shatter.images[i].image.style.top = shatter.images[i].y + 75 + 'px';
-            domElement.appendChild(shatter.images[i].image);
-        }
+    // adjustment to center image on screen
+    var adjustment = (window.innerWidth / 2) - image.width / 2;
+    for (var i = 0; i < shatter.images.length; i++) {
+        shatter.images[i].image.style.position = 'absolute';
+        shatter.images[i].image.style.left = shatter.images[i].x + adjustment + 'px';
+        shatter.images[i].image.style.top = shatter.images[i].y + 75 + 'px';
+        domElement.appendChild(shatter.images[i].image);
+    }
 }
