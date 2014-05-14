@@ -10,7 +10,7 @@
  * @constructor
  * @param {object} img - The image to shatter.
  * @param {number} numPolys - The number to pieces (polygons) to split the image into.
- * @param {number} scale [multiplier=1] - The amount to scale resultings pieces coordinates.
+ * @param {number} scale [multiplier=1] - The amount to scale resulting pieces coordinates.
  */
 function Shatter (img, numPolys, scale) {
     this.img = img;
@@ -25,6 +25,7 @@ function Shatter (img, numPolys, scale) {
     this.calcBoundaries(polygons, this.img);
     this.scaleCoordinates(polygons, scale);
     this.images = this.spliceImage(polygons, img);
+    this.debug = this.getDebugImage(polygons, '#fff');
 };
 
 /**
@@ -204,4 +205,49 @@ Shatter.prototype.getCroppedImage = function (polygon, tempBigImage) {
         cropCanvas = null;
 
         return saveImage;
+};
+
+/**
+ * Draw voronoi and return as image
+ * @param {object} polygon - An object containing points and min and max vals
+ * @param {string} color - The color to draw the outline
+ *
+ * @returns {object} - The debug image
+ */
+Shatter.prototype.getDebugImage = function (polygons, color) {
+    // create a temporary canvas so we can reuse it for each polygon
+    var tempCanvas = document.createElement('canvas');
+    tempCanvas.width = this.img.width;
+    tempCanvas.height = this.img.height;
+    var ctx = tempCanvas.getContext("2d");
+
+    // loop through each polygon
+    polygons.forEach(function (polygon) {
+        // loop through each pair of coordinates
+        polygon.forEach(function (coordinatePair, index, polygon) {
+            // check if first pair of coordinates and start path
+            if (index === 0) {
+                ctx.beginPath();
+                ctx.moveTo(coordinatePair[0], coordinatePair[1]);
+                return
+            }
+            // draw line to next coordinate
+            ctx.lineTo(coordinatePair[0], coordinatePair[1]);
+
+            // last coordinate, close polygon
+            if (index === polygon.length - 1) {
+                ctx.lineTo(polygon[0][0], polygon[0][1]);
+            }
+        });
+        ctx.closePath();
+        ctx.strokeStyle = color;
+        ctx.stroke();
+        
+        return;
+    });
+    // save clipped image
+    var debugImage = new Image();
+    debugImage.src = tempCanvas.toDataURL("image/png");
+
+    return debugImage;
 };
