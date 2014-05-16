@@ -220,6 +220,7 @@ Shatter.prototype.getDebugImage = function (polygons, color) {
     tempCanvas.width = this.img.width;
     tempCanvas.height = this.img.height;
     var ctx = tempCanvas.getContext("2d");
+    var color = color || '#fff';
 
     // loop through each polygon
     polygons.forEach(function (polygon) {

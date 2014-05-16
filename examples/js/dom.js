@@ -35,6 +35,11 @@ image.addEventListener("load", function() {
         shattered.push(shatter);
 
         placeShatter(shatter, div[0]);
+        // place debug
+        if (document.getElementsByClassName('debug')[0].checked) {
+            
+        }
+
         // clear out the input, otherwise the input box becomes unresponsive
         $('#numPieces').val('');
 
@@ -84,9 +89,20 @@ function placeShatter (shatter, domElement) {
     // adjustment to center image on screen
     var adjustment = (window.innerWidth / 2) - image.width / 2;
     for (var i = 0; i < shatter.images.length; i++) {
-        shatter.images[i].image.style.position = 'absolute';
-        shatter.images[i].image.style.left = shatter.images[i].x + adjustment + 'px';
-        shatter.images[i].image.style.top = shatter.images[i].y + 75 + 'px';
-        domElement.appendChild(shatter.images[i].image);
+        placeImageAbsolute(shatter.images[i].image,
+                           domElement, 
+                           shatter.images[i].x, 
+                           shatter.images[i].y,
+                           adjustment,
+                           75);
     }
+}
+
+function placeImageAbsolute (image, domElement, x, y, xOff, yOff) {
+    var xOff = xOff || 0;
+    var yOff = yOff || 0;
+    image.style.position = 'absolute';
+    image.style.left = x + xOff + 'px';
+    image.style.top = y + yOff + 'px';
+    domElement.appendChild(image);
 }
