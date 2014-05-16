@@ -37,7 +37,7 @@ image.addEventListener("load", function() {
         placeShatter(shatter, div[0]);
         // place debug
         if (document.getElementsByClassName('debug')[0].checked) {
-            
+            placeImageAbsolute(shatter.debug, div[0], 0, 0);
         }
 
         // clear out the input, otherwise the input box becomes unresponsive
