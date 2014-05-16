@@ -98,6 +98,16 @@ function placeShatter (shatter, domElement) {
     }
 }
 
+/**
+ * Places an image into dom element and absolutely positions
+ *
+ * @param {object} image - image to append to dom
+ * @param {object} domElement - dom element to append image 
+ * @param {number} x - x coordinate to position image at
+ * @param {number} y - y coordinate to position image at
+ * @param {number} xOff - x offset added to x coordinate
+ * @param {number} yOff - y offset added to x coordinate
+ */
 function placeImageAbsolute (image, domElement, x, y, xOff, yOff) {
     var xOff = xOff || 0;
     var yOff = yOff || 0;
