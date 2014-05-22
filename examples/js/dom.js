@@ -31,14 +31,15 @@ image.addEventListener("load", function() {
 
     // Make new shatter object
     $('.new-shatter').on('click', function() {
+        var debug = document.getElementsByClassName('debug')[0].checked;
         var numPieces = $('#numPieces').val();
         // 10 pieces if none specified
-        var shatter = new Shatter(image, numPieces || 10);
+        var shatter = new Shatter(image, numPieces || 10, 1, debug);
         shattered.push(shatter);
 
         placeShatter(shatter, div[0]);
         // place debug
-        if (document.getElementsByClassName('debug')[0].checked) {
+        if (debug) {
             var center = (window.innerWidth / 2) - image.width / 2;
             placeImageAbsolute(shatter.debug, div[0], center, YLOC);
             shattered.push(shatter.debug);
