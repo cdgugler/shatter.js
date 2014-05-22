@@ -1,5 +1,5 @@
 !function(){
-  var d3 = {version: "3.4.6"}; // semver
+  var d3 = {version: "3.4.8"}; // semver
 d3.ascending = d3_ascending;
 
 function d3_ascending(a, b) {
@@ -1418,8 +1418,9 @@ function d3_geom_voronoiTriangleArea(a, b, c) {
  * @param {object} img - The image to shatter.
  * @param {number} numPolys - The number to pieces (polygons) to split the image into.
  * @param {number} scale [multiplier=1] - The amount to scale resulting pieces coordinates.
+ * @param {boolean} debug - Adds debug image to returned Shatter object if true
  */
-function Shatter (img, numPolys, scale) {
+function Shatter (img, numPolys, scale, debug) {
     this.img = img;
     this.numPolys = numPolys;
     this.images = [];
@@ -1432,7 +1433,9 @@ function Shatter (img, numPolys, scale) {
     this.calcBoundaries(polygons, this.img);
     this.scaleCoordinates(polygons, scale);
     this.images = this.spliceImage(polygons, img);
-    this.debug = this.getDebugImage(polygons, '#fff');
+    if (debug) {
+        this.debug = this.getDebugImage(polygons, '#fff');
+    }
 };
 
 /**
@@ -1627,6 +1630,7 @@ Shatter.prototype.getDebugImage = function (polygons, color) {
     tempCanvas.width = this.img.width;
     tempCanvas.height = this.img.height;
     var ctx = tempCanvas.getContext("2d");
+    var color = color || '#fff';
 
     // loop through each polygon
     polygons.forEach(function (polygon) {

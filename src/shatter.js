@@ -11,8 +11,9 @@
  * @param {object} img - The image to shatter.
  * @param {number} numPolys - The number to pieces (polygons) to split the image into.
  * @param {number} scale [multiplier=1] - The amount to scale resulting pieces coordinates.
+ * @param {boolean} debug - Adds debug image to returned Shatter object if true
  */
-function Shatter (img, numPolys, scale) {
+function Shatter (img, numPolys, scale, debug) {
     this.img = img;
     this.numPolys = numPolys;
     this.images = [];
@@ -25,7 +26,9 @@ function Shatter (img, numPolys, scale) {
     this.calcBoundaries(polygons, this.img);
     this.scaleCoordinates(polygons, scale);
     this.images = this.spliceImage(polygons, img);
-    this.debug = this.getDebugImage(polygons, '#fff');
+    if (debug) {
+        this.debug = this.getDebugImage(polygons, '#fff');
+    }
 };
 
 /**

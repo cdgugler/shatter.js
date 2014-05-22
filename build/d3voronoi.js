@@ -1,5 +1,5 @@
 !function(){
-  var d3 = {version: "3.4.6"}; // semver
+  var d3 = {version: "3.4.8"}; // semver
 d3.ascending = d3_ascending;
 
 function d3_ascending(a, b) {
