@@ -1,6 +1,6 @@
 /**
  * Shatter.js: JavaScript image shattering
- * @version 0.1.2
+ * @version 0.1.3
  * @license MIT License https://github.com/cdgugler/shatter.js/raw/dev/LICENSE.md
  * @author Cory Gugler - cory@addlime.com
  */
