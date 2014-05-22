@@ -1,6 +1,7 @@
 var image = new Image();
 image.src = "img/BlueMarbleNasa.png";
 var shattered = [];
+var YLOC = 75;
 
 // jGravity seems to disable input even though ignored
 // a simulated click seems to fix it
@@ -37,7 +38,8 @@ image.addEventListener("load", function() {
         placeShatter(shatter, div[0]);
         // place debug
         if (document.getElementsByClassName('debug')[0].checked) {
-            placeImageAbsolute(shatter.debug, div[0], 0, 0);
+            var center = (window.innerWidth / 2) - image.width / 2;
+            placeImageAbsolute(shatter.debug, div[0], center, YLOC);
         }
 
         // clear out the input, otherwise the input box becomes unresponsive
@@ -94,7 +96,7 @@ function placeShatter (shatter, domElement) {
                            shatter.images[i].x, 
                            shatter.images[i].y,
                            adjustment,
-                           75);
+                           YLOC);
     }
 }
 
