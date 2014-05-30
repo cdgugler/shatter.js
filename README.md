@@ -51,4 +51,9 @@ See the examples for more details!
 See the [project page](http://cdgugler.github.io/shatter.js/).
 
 ## License
+
 - [MIT license](LICENSE.md)
+
+## Credits
+
+Shatter.js is created and maintained by [Cory Gugler](http://www.addlime.com)
