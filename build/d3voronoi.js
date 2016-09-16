@@ -1,5 +1,5 @@
 !function(){
-  var d3 = {version: "3.4.8"}; // semver
+  var d3 = {version: "3.5.17"}; // semver
 d3.ascending = d3_ascending;
 
 function d3_ascending(a, b) {
@@ -14,10 +14,10 @@ d3.min = function(array, f) {
       a,
       b;
   if (arguments.length === 1) {
-    while (++i < n && !((a = array[i]) != null && a <= a)) a = undefined;
+    while (++i < n) if ((b = array[i]) != null && b >= b) { a = b; break; }
     while (++i < n) if ((b = array[i]) != null && a > b) a = b;
   } else {
-    while (++i < n && !((a = f.call(array, array[i], i)) != null && a <= a)) a = undefined;
+    while (++i < n) if ((b = f.call(array, array[i], i)) != null && b >= b) { a = b; break; }
     while (++i < n) if ((b = f.call(array, array[i], i)) != null && a > b) a = b;
   }
   return a;
@@ -28,10 +28,10 @@ d3.max = function(array, f) {
       a,
       b;
   if (arguments.length === 1) {
-    while (++i < n && !((a = array[i]) != null && a <= a)) a = undefined;
+    while (++i < n) if ((b = array[i]) != null && b >= b) { a = b; break; }
     while (++i < n) if ((b = array[i]) != null && b > a) a = b;
   } else {
-    while (++i < n && !((a = f.call(array, array[i], i)) != null && a <= a)) a = undefined;
+    while (++i < n) if ((b = f.call(array, array[i], i)) != null && b >= b) { a = b; break; }
     while (++i < n) if ((b = f.call(array, array[i], i)) != null && b > a) a = b;
   }
   return a;
@@ -43,13 +43,13 @@ d3.extent = function(array, f) {
       b,
       c;
   if (arguments.length === 1) {
-    while (++i < n && !((a = c = array[i]) != null && a <= a)) a = c = undefined;
+    while (++i < n) if ((b = array[i]) != null && b >= b) { a = c = b; break; }
     while (++i < n) if ((b = array[i]) != null) {
       if (a > b) a = b;
       if (c < b) c = b;
     }
   } else {
-    while (++i < n && !((a = c = f.call(array, array[i], i)) != null && a <= a)) a = undefined;
+    while (++i < n) if ((b = f.call(array, array[i], i)) != null && b >= b) { a = c = b; break; }
     while (++i < n) if ((b = f.call(array, array[i], i)) != null) {
       if (a > b) a = b;
       if (c < b) c = b;
@@ -57,23 +57,26 @@ d3.extent = function(array, f) {
   }
   return [a, c];
 };
+function d3_number(x) {
+  return x === null ? NaN : +x;
+}
+
+function d3_numeric(x) {
+  return !isNaN(x);
+}
+
 d3.sum = function(array, f) {
   var s = 0,
       n = array.length,
       a,
       i = -1;
-
   if (arguments.length === 1) {
-    while (++i < n) if (!isNaN(a = +array[i])) s += a;
+    while (++i < n) if (d3_numeric(a = +array[i])) s += a; // zero and null are equivalent
   } else {
-    while (++i < n) if (!isNaN(a = +f.call(array, array[i], i))) s += a;
+    while (++i < n) if (d3_numeric(a = +f.call(array, array[i], i))) s += a;
   }
-
   return s;
 };
-function d3_number(x) {
-  return x != null && !isNaN(x);
-}
 
 d3.mean = function(array, f) {
   var s = 0,
@@ -82,11 +85,11 @@ d3.mean = function(array, f) {
       i = -1,
       j = n;
   if (arguments.length === 1) {
-    while (++i < n) if (d3_number(a = array[i])) s += a; else --j;
+    while (++i < n) if (d3_numeric(a = d3_number(array[i]))) s += a; else --j;
   } else {
-    while (++i < n) if (d3_number(a = f.call(array, array[i], i))) s += a; else --j;
+    while (++i < n) if (d3_numeric(a = d3_number(f.call(array, array[i], i)))) s += a; else --j;
   }
-  return j ? s / j : undefined;
+  if (j) return s / j;
 };
 // R-7 per <http://en.wikipedia.org/wiki/Quantile>
 d3.quantile = function(values, p) {
@@ -98,9 +101,49 @@ d3.quantile = function(values, p) {
 };
 
 d3.median = function(array, f) {
-  if (arguments.length > 1) array = array.map(f);
-  array = array.filter(d3_number);
-  return array.length ? d3.quantile(array.sort(d3_ascending), .5) : undefined;
+  var numbers = [],
+      n = array.length,
+      a,
+      i = -1;
+  if (arguments.length === 1) {
+    while (++i < n) if (d3_numeric(a = d3_number(array[i]))) numbers.push(a);
+  } else {
+    while (++i < n) if (d3_numeric(a = d3_number(f.call(array, array[i], i)))) numbers.push(a);
+  }
+  if (numbers.length) return d3.quantile(numbers.sort(d3_ascending), 0.5);
+};
+
+d3.variance = function(array, f) {
+  var n = array.length,
+      m = 0,
+      a,
+      d,
+      s = 0,
+      i = -1,
+      j = 0;
+  if (arguments.length === 1) {
+    while (++i < n) {
+      if (d3_numeric(a = d3_number(array[i]))) {
+        d = a - m;
+        m += d / ++j;
+        s += d * (a - m);
+      }
+    }
+  } else {
+    while (++i < n) {
+      if (d3_numeric(a = d3_number(f.call(array, array[i], i)))) {
+        d = a - m;
+        m += d / ++j;
+        s += d * (a - m);
+      }
+    }
+  }
+  if (j > 1) return s / (j - 1);
+};
+
+d3.deviation = function() {
+  var v = d3.variance.apply(this, arguments);
+  return v ? Math.sqrt(v) : v;
 };
 
 function d3_bisector(compare) {
@@ -137,11 +180,12 @@ d3.bisector = function(f) {
       ? function(d, x) { return d3_ascending(f(d), x); }
       : f);
 };
-d3.shuffle = function(array) {
-  var m = array.length, t, i;
+d3.shuffle = function(array, i0, i1) {
+  if ((m = arguments.length) < 3) { i1 = array.length; if (m < 2) i0 = 0; }
+  var m = i1 - i0, t, i;
   while (m) {
     i = Math.random() * m-- | 0;
-    t = array[m], array[m] = array[i], array[i] = t;
+    t = array[m + i0], array[m + i0] = array[i + i0], array[i + i0] = t;
   }
   return array;
 };
@@ -156,22 +200,22 @@ d3.pairs = function(array) {
   return pairs;
 };
 
-d3.zip = function() {
-  if (!(n = arguments.length)) return [];
-  for (var i = -1, m = d3.min(arguments, d3_zipLength), zips = new Array(m); ++i < m;) {
-    for (var j = -1, n, zip = zips[i] = new Array(n); ++j < n;) {
-      zip[j] = arguments[j][i];
+d3.transpose = function(matrix) {
+  if (!(n = matrix.length)) return [];
+  for (var i = -1, m = d3.min(matrix, d3_transposeLength), transpose = new Array(m); ++i < m;) {
+    for (var j = -1, n, row = transpose[i] = new Array(n); ++j < n;) {
+      row[j] = matrix[j][i];
     }
   }
-  return zips;
+  return transpose;
 };
 
-function d3_zipLength(d) {
+function d3_transposeLength(d) {
   return d.length;
 }
 
-d3.transpose = function(matrix) {
-  return d3.zip.apply(d3, matrix);
+d3.zip = function() {
+  return d3.transpose(arguments);
 };
 d3.keys = function(map) {
   var keys = [];
@@ -236,80 +280,94 @@ function d3_range_integerScale(x) {
   return k;
 }
 function d3_class(ctor, properties) {
-  try {
-    for (var key in properties) {
-      Object.defineProperty(ctor.prototype, key, {
-        value: properties[key],
-        enumerable: false
-      });
-    }
-  } catch (e) {
-    ctor.prototype = properties;
+  for (var key in properties) {
+    Object.defineProperty(ctor.prototype, key, {
+      value: properties[key],
+      enumerable: false
+    });
   }
 }
 
-d3.map = function(object) {
+d3.map = function(object, f) {
   var map = new d3_Map;
-  if (object instanceof d3_Map) object.forEach(function(key, value) { map.set(key, value); });
-  else for (var key in object) map.set(key, object[key]);
+  if (object instanceof d3_Map) {
+    object.forEach(function(key, value) { map.set(key, value); });
+  } else if (Array.isArray(object)) {
+    var i = -1,
+        n = object.length,
+        o;
+    if (arguments.length === 1) while (++i < n) map.set(i, object[i]);
+    else while (++i < n) map.set(f.call(object, o = object[i], i), o);
+  } else {
+    for (var key in object) map.set(key, object[key]);
+  }
   return map;
 };
 
-function d3_Map() {}
+function d3_Map() {
+  this._ = Object.create(null);
+}
+
+var d3_map_proto = "__proto__",
+    d3_map_zero = "\0";
 
 d3_class(d3_Map, {
   has: d3_map_has,
   get: function(key) {
-    return this[d3_map_prefix + key];
+    return this._[d3_map_escape(key)];
   },
   set: function(key, value) {
-    return this[d3_map_prefix + key] = value;
+    return this._[d3_map_escape(key)] = value;
   },
   remove: d3_map_remove,
   keys: d3_map_keys,
   values: function() {
     var values = [];
-    this.forEach(function(key, value) { values.push(value); });
+    for (var key in this._) values.push(this._[key]);
     return values;
   },
   entries: function() {
     var entries = [];
-    this.forEach(function(key, value) { entries.push({key: key, value: value}); });
+    for (var key in this._) entries.push({key: d3_map_unescape(key), value: this._[key]});
     return entries;
   },
   size: d3_map_size,
   empty: d3_map_empty,
   forEach: function(f) {
-    for (var key in this) if (key.charCodeAt(0) === d3_map_prefixCode) f.call(this, key.substring(1), this[key]);
+    for (var key in this._) f.call(this, d3_map_unescape(key), this._[key]);
   }
 });
 
-var d3_map_prefix = "\0", // prevent collision with built-ins
-    d3_map_prefixCode = d3_map_prefix.charCodeAt(0);
+function d3_map_escape(key) {
+  return (key += "") === d3_map_proto || key[0] === d3_map_zero ? d3_map_zero + key : key;
+}
+
+function d3_map_unescape(key) {
+  return (key += "")[0] === d3_map_zero ? key.slice(1) : key;
+}
 
 function d3_map_has(key) {
-  return d3_map_prefix + key in this;
+  return d3_map_escape(key) in this._;
 }
 
 function d3_map_remove(key) {
-  key = d3_map_prefix + key;
-  return key in this && delete this[key];
+  return (key = d3_map_escape(key)) in this._ && delete this._[key];
 }
 
 function d3_map_keys() {
   var keys = [];
-  this.forEach(function(key) { keys.push(key); });
+  for (var key in this._) keys.push(d3_map_unescape(key));
   return keys;
 }
 
 function d3_map_size() {
   var size = 0;
-  for (var key in this) if (key.charCodeAt(0) === d3_map_prefixCode) ++size;
+  for (var key in this._) ++size;
   return size;
 }
 
 function d3_map_empty() {
-  for (var key in this) if (key.charCodeAt(0) === d3_map_prefixCode) return false;
+  for (var key in this._) return false;
   return true;
 }
 
@@ -415,23 +473,22 @@ d3.set = function(array) {
   return set;
 };
 
-function d3_Set() {}
+function d3_Set() {
+  this._ = Object.create(null);
+}
 
 d3_class(d3_Set, {
   has: d3_map_has,
-  add: function(value) {
-    this[d3_map_prefix + value] = true;
-    return value;
+  add: function(key) {
+    this._[d3_map_escape(key += "")] = true;
+    return key;
   },
-  remove: function(value) {
-    value = d3_map_prefix + value;
-    return value in this && delete this[value];
-  },
+  remove: d3_map_remove,
   values: d3_map_keys,
   size: d3_map_size,
   empty: d3_map_empty,
   forEach: function(f) {
-    for (var value in this) if (value.charCodeAt(0) === d3_map_prefixCode) f.call(this, value.substring(1));
+    for (var key in this._) f.call(this, d3_map_unescape(key));
   }
 });
 function d3_functor(v) {
@@ -439,11 +496,12 @@ function d3_functor(v) {
 }
 
 d3.functor = d3_functor;
-var π = Math.PI,
-    τ = 2 * π,
-    halfπ = π / 2,
-    ε = 1e-6,
+var ε = 1e-6,
     ε2 = ε * ε,
+    π = Math.PI,
+    τ = 2 * π,
+    τε = τ - ε,
+    halfπ = π / 2,
     d3_radians = π / 180,
     d3_degrees = 180 / π;
 
@@ -1397,11 +1455,7 @@ var d3_geom_voronoiClipExtent = [[-1e6, -1e6], [1e6, 1e6]];
 function d3_geom_voronoiTriangleArea(a, b, c) {
   return (a.x - c.x) * (b.y - a.y) - (a.x - b.x) * (c.y - a.y);
 }
-  if (typeof define === "function" && define.amd) {
-    define(d3);
-  } else if (typeof module === "object" && module.exports) {
-    module.exports = d3;
-  } else {
-    this.d3 = d3;
-  }
+  if (typeof define === "function" && define.amd) this.d3 = d3, define(d3);
+  else if (typeof module === "object" && module.exports) module.exports = d3;
+  else this.d3 = d3;
 }();
