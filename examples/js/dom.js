@@ -11,10 +11,10 @@ $('#numPieces').click();
 // create shatter object after image has loaded
 image.addEventListener("load", function() {
     var div = document.querySelectorAll('.shatter');
-    var shatter = new Shatter(image, 10);
+    var shatter = Shatter.Shatter(image, 10);
     shattered.push(shatter);
 
-    // loop through images in shatter object and insert into 
+    // loop through images in shatter object and insert into
     // dom at correct position
     placeShatter(shatter, div[0]);
 
@@ -34,7 +34,7 @@ image.addEventListener("load", function() {
         var debug = document.getElementsByClassName('debug')[0].checked;
         var numPieces = $('#numPieces').val();
         // 10 pieces if none specified
-        var shatter = new Shatter(image, numPieces || 10, 1, debug);
+        var shatter = Shatter.Shatter(image, numPieces || 10, 1, debug);
         shattered.push(shatter);
 
         placeShatter(shatter, div[0]);
@@ -100,8 +100,8 @@ function placeShatter (shatter, domElement) {
     var adjustment = (window.innerWidth / 2) - image.width / 2;
     for (var i = 0; i < shatter.images.length; i++) {
         placeImageAbsolute(shatter.images[i].image,
-                           domElement, 
-                           shatter.images[i].x, 
+                           domElement,
+                           shatter.images[i].x,
                            shatter.images[i].y,
                            adjustment,
                            YLOC);
@@ -112,7 +112,7 @@ function placeShatter (shatter, domElement) {
  * Places an image into dom element and absolutely positions
  *
  * @param {object} image - image to append to dom
- * @param {object} domElement - dom element to append image 
+ * @param {object} domElement - dom element to append image
  * @param {number} x - x coordinate to position image at
  * @param {number} y - y coordinate to position image at
  * @param {number} xOff - x offset added to x coordinate
