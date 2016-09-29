@@ -5,6 +5,7 @@ module.exports = {
     output: {
         library: 'Shatter',
         path: __dirname + '/build',
+        publicPath: '/build',
         filename: 'shatter.js'
     },
     module: {

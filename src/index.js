@@ -1,4 +1,4 @@
-/**
+/*!
  * Shatter.js: JavaScript image shattering
  * @version 0.1.3
  * @license MIT License https://github.com/cdgugler/shatter.js/raw/dev/LICENSE.md
@@ -8,8 +8,8 @@
 import { range } from "d3-array";
 import { voronoi } from "d3-voronoi";
 
-exports.Shatter = function (img, numPolys, scale, debug) {
-    return new Shatter (img, numPolys, scale, debug);
+exports.Shatter = function (opts, cb) {
+    return new Shatter (opts, cb);
 }
 /**
  * Creates a new Shatter object.
@@ -19,23 +19,30 @@ exports.Shatter = function (img, numPolys, scale, debug) {
  * @param {number} scale [multiplier=1] - The amount to scale resulting pieces coordinates.
  * @param {boolean} debug - Adds debug image to returned Shatter object if true
  */
-function Shatter (img, numPolys, scale, debug) {
-    this.img = img;
-    this.numPolys = numPolys;
+function Shatter (opts, cb) {
+    this.opts = {
+        numPolys: opts.numPolys || 2,
+        scale: opts.scale || 1,
+        debug: opts.debug || false
+    }
+    this.img = opts.img;
     this.images = [];
-    var polygons;
-    var scale = scale || 1;
 
-    // Init shattered image
-    polygons = this.getPolys(img.width, img.height, numPolys);
+    this.init();
+    cb(this);
+};
+
+Shatter.prototype.init = function () {
+    var polygons;
+    polygons = this.getPolys(this.img.width, this.img.height, this.opts.numPolys);
     this.roundVertices(polygons);
     this.calcBoundaries(polygons, this.img);
-    this.scaleCoordinates(polygons, scale);
-    this.images = this.spliceImage(polygons, img);
-    if (debug) {
+    this.scaleCoordinates(polygons, this.opts.scale);
+    this.images = this.spliceImage(polygons, this.img);
+    if (this.opts.debug) {
         this.debug = this.getDebugImage(polygons, '#fff');
     }
-};
+}
 
 /**
  * Divides a rectangular area into Voronoi cells

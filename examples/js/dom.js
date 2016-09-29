@@ -11,57 +11,14 @@ $('#numPieces').click();
 // create shatter object after image has loaded
 image.addEventListener("load", function() {
     var div = document.querySelectorAll('.shatter');
-    var shatter = Shatter.Shatter(image, 10);
-    shattered.push(shatter);
+    var shatter = Shatter.Shatter({ img: image, numPolys: 10 }, function (result) {
+        shattered.push(result);
+        // loop through images in shatter object and insert into
+        // dom at correct position
+        placeShatter(result, div[0]);
 
-    // loop through images in shatter object and insert into
-    // dom at correct position
-    placeShatter(shatter, div[0]);
-
-    // wait a bit to add dom gravity
-    window.setTimeout(function() {
-        $('.container').jGravity({
-            target: '.shatter img',
-            ignoreClass: 'ignore',
-            weight: 25,
-            depth: 5,
-            drag: true
-        });
-    }, 100);
-
-    // Make new shatter object
-    $('.new-shatter').on('click', function() {
-        var debug = document.getElementsByClassName('debug')[0].checked;
-        var numPieces = $('#numPieces').val();
-        // 10 pieces if none specified
-        var shatter = Shatter.Shatter(image, numPieces || 10, 1, debug);
-        shattered.push(shatter);
-
-        placeShatter(shatter, div[0]);
-        // place debug
-        if (debug) {
-            var center = (window.innerWidth / 2) - image.width / 2;
-            placeImageAbsolute(shatter.debug, div[0], center, YLOC);
-            shattered.push(shatter.debug);
-        }
-
-        // clear out the input, otherwise the input box becomes unresponsive
-        $('#numPieces').val('');
-
-        if (!document.getElementsByClassName('shatter-check')[0].checked) {
-            // TODO
-            // figure out why it freaks out on first new shatter without a short delay before calling jGravity.
-            window.setTimeout(function() {
-                $('.container').jGravity({
-                    target: '.shatter img',
-                    ignoreClass: 'ignore',
-                    weight: 25,
-                    depth: 5,
-                    drag: true
-                });
-            }, 100);
-        }
-        $('.shatter img').click(function() {
+        // wait a bit to add dom gravity
+        window.setTimeout(function() {
             $('.container').jGravity({
                 target: '.shatter img',
                 ignoreClass: 'ignore',
@@ -69,7 +26,53 @@ image.addEventListener("load", function() {
                 depth: 5,
                 drag: true
             });
-            $('.shatter img').off('click');
+        }, 100);
+    });
+
+
+
+    // Make new shatter object
+    $('.new-shatter').on('click', function() {
+        var debug = document.getElementsByClassName('debug')[0].checked;
+        var numPieces = $('#numPieces').val();
+        // 10 pieces if none specified
+        var shatter = Shatter.Shatter({ img: image, numPolys: numPieces || 10, debug: true }, function (result) {
+            shattered.push(result);
+            placeShatter(result, div[0]);
+
+            // place debug
+            if (debug) {
+                var center = (window.innerWidth / 2) - image.width / 2;
+                placeImageAbsolute(result.debug, div[0], center, YLOC);
+                shattered.push(result.debug);
+            }
+
+            // clear out the input, otherwise the input box becomes unresponsive
+            $('#numPieces').val('');
+
+            if (!document.getElementsByClassName('shatter-check')[0].checked) {
+                // TODO
+                // figure out why it freaks out on first new shatter without a short delay before calling jGravity.
+                window.setTimeout(function() {
+                    $('.container').jGravity({
+                        target: '.shatter img',
+                        ignoreClass: 'ignore',
+                        weight: 25,
+                        depth: 5,
+                        drag: true
+                    });
+                }, 100);
+            }
+            $('.shatter img').click(function() {
+                $('.container').jGravity({
+                    target: '.shatter img',
+                    ignoreClass: 'ignore',
+                    weight: 25,
+                    depth: 5,
+                    drag: true
+                });
+                $('.shatter img').off('click');
+            });
         });
     });
 }, false);
