@@ -27,21 +27,23 @@ function Shatter (opts, cb) {
     }
     this.img = opts.img;
     this.images = [];
+    this.cb = cb;
 
     this.init();
-    cb(this);
 };
 
 Shatter.prototype.init = function () {
-    var polygons;
-    polygons = this.getPolys(this.img.width, this.img.height, this.opts.numPolys);
+    var polygons = this.getPolys(this.img.width, this.img.height, this.opts.numPolys);
     this.roundVertices(polygons);
     this.calcBoundaries(polygons, this.img);
     this.scaleCoordinates(polygons, this.opts.scale);
-    this.images = this.spliceImage(polygons, this.img);
-    if (this.opts.debug) {
-        this.debug = this.getDebugImage(polygons, '#fff');
-    }
+    this.spliceImage(polygons, this.img, (images) => {
+        this.images = images;
+        if (this.opts.debug) {
+            this.debug = this.getDebugImage(polygons, '#fff');
+        }
+        this.cb(this);
+    });
 }
 
 /**
@@ -139,7 +141,7 @@ Shatter.prototype.calcBoundaries = function (polygons, img) {
  * @returns {array} imageList - {array} [{object} image, {array} [minX, minY], {array} [polygon.points]]
  *
  */
-Shatter.prototype.spliceImage = function (polygons, img) {
+Shatter.prototype.spliceImage = function (polygons, img, cb) {
     var imageList = [];
 
     // create a temporary canvas so we can reuse it for each polygon
@@ -166,7 +168,8 @@ Shatter.prototype.spliceImage = function (polygons, img) {
         return;
     });
     tempCanvas = null;
-    return imageList;
+
+    cb(imageList);
 };
 
 /**

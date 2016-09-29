@@ -77,21 +77,24 @@ var Shatter =
 	    };
 	    this.img = opts.img;
 	    this.images = [];
+	    this.cb = cb;
 
 	    this.init();
-	    cb(this);
 	};
 
 	Shatter.prototype.init = function () {
-	    var polygons;
-	    polygons = this.getPolys(this.img.width, this.img.height, this.opts.numPolys);
+	    var _this = this;
+
+	    var polygons = this.getPolys(this.img.width, this.img.height, this.opts.numPolys);
 	    this.roundVertices(polygons);
 	    this.calcBoundaries(polygons, this.img);
 	    this.scaleCoordinates(polygons, this.opts.scale);
-	    this.images = this.spliceImage(polygons, this.img);
-	    if (this.opts.debug) {
-	        this.debug = this.getDebugImage(polygons, '#fff');
-	    }
+	    this.images = this.spliceImage(polygons, this.img, function () {
+	        if (_this.opts.debug) {
+	            _this.debug = _this.getDebugImage(polygons, '#fff');
+	        }
+	        _this.cb(_this);
+	    });
 	};
 
 	/**
