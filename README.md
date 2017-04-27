@@ -1,3 +1,7 @@
+# Currently Unmaintained
+
+Warning! This project is currently unmaintained. I started a rewrite of this project in 2016 but have been unable to return to it. No ETA at the moment, please feel free to fork or send pull requests.
+
 # Shatter.js
 
 Shatter.js provides simple image shattering by dividing a given 
