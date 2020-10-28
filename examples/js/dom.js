@@ -1,15 +1,27 @@
+import { Shatter } from "../../src/index";
+
 var image = new Image();
 image.src = "img/BlueMarbleNasa.png";
 var shattered = [];
 
 // jGravity seems to disable input even though ignored
 // a simulated click seems to fix it
-$('#numPieces').click();
+// $('#numPieces').click();
 
 // create shatter object after image has loaded
-image.addEventListener("load", function() {
+image.addEventListener("load", async function() {
     var div = document.querySelectorAll('.shatter');
-    var shatter = new Shatter(image, 10);
+    var shatter = new Shatter('img/BlueMarbleNasa.png');
+
+    let img = await shatter.shatter();
+    console.log('Img is: ', img);
+    document.body.appendChild(img);
+    let img2 = await shatter.shatter();
+    console.log('Img2 is: ', img);
+    document.body.appendChild(img);
+    document.body.appendChild(img2);
+
+    return;
     shattered.push(shatter);
 
     // loop through images in shatter object and insert into 
@@ -53,6 +65,7 @@ image.addEventListener("load", function() {
 }, false);
 
 // clear out all shattered images
+/*
 $('.remove-all').on('click', function() {
     shattered.forEach(function(shatter) {
         shatter.images.forEach(function(image) {
@@ -61,6 +74,7 @@ $('.remove-all').on('click', function() {
         });
     });
 });
+*/
 
 /**
  * Places given shatter objects images into the specified dom element
