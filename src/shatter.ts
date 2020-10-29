@@ -1,11 +1,11 @@
-import loadImage from "./lib/loadImage";
-import Bounds from "./lib/Bounds";
+import loadImage from './lib/loadImage';
+import Bounds from './lib/Bounds';
 
 type ShatterOptions = {
     numPieces?: number;
 };
 
-export type Coordinate = [number, number]
+export type Coordinate = [number, number];
 
 export type Piece = Coordinate[];
 
@@ -16,14 +16,14 @@ type ShatteredImage = {
 };
 
 class Shatter {
-    url: string = "";
+    url: string = '';
     numPieces: number = 4;
     originalImage: HTMLImageElement | undefined;
     pieces: Piece[] = [];
     images: ShatteredImage[] = [];
 
     constructor(url?: string, options?: ShatterOptions) {
-        this.url = url ? url : "";
+        this.url = url ? url : '';
         this.numPieces = options?.numPieces ?? this.numPieces;
     }
 
@@ -39,7 +39,7 @@ class Shatter {
         if (!this.originalImage) {
             try {
                 this.originalImage = await loadImage(this.url);
-            } catch(e) {
+            } catch (e) {
                 console.error(e);
                 return;
             }
@@ -48,13 +48,13 @@ class Shatter {
         const results = this.pieces.map(async (piece) => {
             return new Promise<ShatteredImage>(async (res, rej) => {
                 if (!this.originalImage) {
-                    rej("Image not set");
+                    rej('Image not set');
                 }
 
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = this.originalImage?.width ?? 0;
                 tempCanvas.height = this.originalImage?.height ?? 0;
-                const tempCtx = tempCanvas.getContext("2d");
+                const tempCtx = tempCanvas.getContext('2d');
                 const pieceBounds = new Bounds(piece[0]);
 
                 for (let i = 0; i < piece.length; i++) {
@@ -62,9 +62,9 @@ class Shatter {
                         tempCtx?.beginPath();
                         tempCtx?.moveTo(piece[i][0], piece[i][1]);
                         continue;
-                    } 
+                    }
 
-                    tempCtx?.lineTo(piece[i][0], piece[i][1])
+                    tempCtx?.lineTo(piece[i][0], piece[i][1]);
 
                     if (i === piece.length - 1) {
                         tempCtx?.lineTo(piece[0][0], piece[0][1]);
@@ -76,26 +76,24 @@ class Shatter {
                 tempCtx?.clip();
                 tempCtx?.drawImage(this.originalImage ?? new Image(), 0, 0);
 
-                let clippedImage = await loadImage(tempCanvas.toDataURL("image/png"));
+                let clippedImage = await loadImage(tempCanvas.toDataURL('image/png'));
 
-                tempCtx?.clearRect(0,0,tempCanvas.width, tempCanvas.height);
+                tempCtx?.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
 
                 tempCanvas.height = pieceBounds.y.max - pieceBounds.y.min;
                 tempCanvas.width = pieceBounds.x.max - pieceBounds.x.min;
                 tempCtx?.drawImage(clippedImage, -pieceBounds.x.min, -pieceBounds.y.min);
-                let croppedImage = await loadImage(tempCanvas.toDataURL("image/png"));
+                let croppedImage = await loadImage(tempCanvas.toDataURL('image/png'));
 
                 res({
                     image: croppedImage,
                     x: pieceBounds.x.min,
-                    y: pieceBounds.y.min
+                    y: pieceBounds.y.min,
                 });
-
             });
         });
 
         this.images = await Promise.all(results);
-
 
         return Promise.resolve(this.images);
     }

@@ -1,13 +1,13 @@
-import { Coordinate } from "../shatter";
+import { Coordinate } from '../shatter';
 
 type Bound = {
     min: number;
     max: number;
-}
+};
 
 export default class Bounds {
-    x: Bound = { min: 0, max: 0};
-    y: Bound = { min: 0, max: 0};
+    x: Bound = { min: 0, max: 0 };
+    y: Bound = { min: 0, max: 0 };
 
     constructor(coord: Coordinate) {
         this.x.min = this.x.max = coord[0];

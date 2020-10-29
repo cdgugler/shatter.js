@@ -1,17 +1,17 @@
-import { Shatter, VoronoiPieces } from "../../src/index";
-import loadImage from "../../src/lib/loadImage";
+import { Shatter, VoronoiPieces } from '../../src/index';
+import loadImage from '../../src/lib/loadImage';
 
 async function run() {
-    const exImagePath = "/img/BlueMarbleNasa.png";
-    const originalImageContainer = document.querySelector(".js-original");
+    const exImagePath = '/img/BlueMarbleNasa.png';
+    const originalImageContainer = document.querySelector('.js-original');
     const original = await loadImage(exImagePath);
     originalImageContainer.appendChild(original);
-    const pieceMargin = "1rem";
+    const pieceMargin = '1rem';
     let wrap = document.querySelector('.js-result');
     let assembled = document.querySelector('.js-result-assembled');
     const formEl = document.querySelector('form');
 
-    formEl.addEventListener('submit', event => {
+    formEl.addEventListener('submit', (event) => {
         event.preventDefault();
         const pieces = event.target.elements?.pieces?.value;
 
@@ -21,12 +21,11 @@ async function run() {
     });
 
     async function shatterExImage(num = 10) {
-
-        while(wrap.firstChild) {
+        while (wrap.firstChild) {
             wrap.firstChild.remove();
         }
 
-        while(assembled.firstChild) {
+        while (assembled.firstChild) {
             assembled.firstChild.remove();
         }
 
@@ -40,23 +39,19 @@ async function run() {
         vshatter.setPieces(voropieces);
         let results = await vshatter.shatter();
 
-        wrap.style.position = "relative";
+        wrap.style.position = 'relative';
 
         results.forEach((res, i) => {
             res.image.style.marginRight = pieceMargin;
             wrap.appendChild(res.image);
 
             const clone = res.image.cloneNode();
-            clone.setAttribute(
-                "style",
-                `position: absolute; top: ${res.y}px; left: ${res.x}px;`
-            );
+            clone.setAttribute('style', `position: absolute; top: ${res.y}px; left: ${res.x}px;`);
             assembled.appendChild(clone);
         });
     }
 
     shatterExImage();
-
 }
 
 run();

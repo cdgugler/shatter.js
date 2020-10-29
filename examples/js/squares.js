@@ -1,17 +1,17 @@
-import { Shatter, VoronoiPieces } from "../../src/index";
-import loadImage from "../../src/lib/loadImage";
+import { Shatter, VoronoiPieces } from '../../src/index';
+import loadImage from '../../src/lib/loadImage';
 
 async function run() {
-    const originalImageContainer = document.querySelector(".js-original");
-    const fourContainer = document.querySelector(".js-four");
-    const twoContainer = document.querySelector(".js-two");
-    const assembleContainer = document.querySelector(".js-assemble");
-    const original = await loadImage("/img/square.png");
+    const originalImageContainer = document.querySelector('.js-original');
+    const fourContainer = document.querySelector('.js-four');
+    const twoContainer = document.querySelector('.js-two');
+    const assembleContainer = document.querySelector('.js-assemble');
+    const original = await loadImage('/img/square.png');
     originalImageContainer.appendChild(original);
-    const squareSize = "100px";
-    const pieceMargin = "1rem";
+    const squareSize = '100px';
+    const pieceMargin = '1rem';
 
-    const shattered = new Shatter("/img/square.png");
+    const shattered = new Shatter('/img/square.png');
     shattered.setPieces([
         [
             [0, 0],
@@ -33,7 +33,7 @@ async function run() {
         twoContainer.appendChild(res.image);
     });
 
-    const shatter2 = new Shatter("/img/square.png");
+    const shatter2 = new Shatter('/img/square.png');
     shatter2.setPieces([
         [
             [0, 0],
@@ -62,8 +62,8 @@ async function run() {
     ]);
     let results = await shatter2.shatter();
 
-    let wrap = document.createElement("div");
-    wrap.style.position = "relative";
+    let wrap = document.createElement('div');
+    wrap.style.position = 'relative';
     wrap.style.height = squareSize;
 
     results.forEach((res, i) => {
@@ -71,10 +71,7 @@ async function run() {
 
         cloned.style.marginRight = pieceMargin;
         fourContainer.appendChild(cloned);
-        res.image.setAttribute(
-            "style",
-            `position: absolute; top: ${res.y}px; left: ${res.x}px;`
-        );
+        res.image.setAttribute('style', `position: absolute; top: ${res.y}px; left: ${res.x}px;`);
         wrap.appendChild(res.image);
     });
 
