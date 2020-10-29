@@ -6,7 +6,7 @@ It also includes a generator, to generate a random set of coordinates based on a
 
 ## Install
 
-`npm install shatter`
+`npm install @cdgugler/shatter`
 
 ## Usage
 

@@ -1,6 +1,7 @@
 {
-    "name": "shatter",
+    "name": "@cdgugler/shatter",
     "version": "2.0.0",
+    "author": "Cory Gugler <cory.gugler@gmail.com> (https://www.addlime.com)",
     "scripts": {
         "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && npm run buildexample",
         "buildexample": "parcel build examples/js/*.js -d examples/js/build/",
