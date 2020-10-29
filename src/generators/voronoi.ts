@@ -10,8 +10,8 @@ export default function VoronoiPieces({
     width: number;
     numPieces: number;
 }): Piece[] {
-    const vertices = Array(numPieces)
-        .fill(0)
+    const vertices: [number, number][] = Array(numPieces)
+        .fill([0, 0])
         .map(() => {
             return [Math.floor(Math.random() * width), Math.floor(Math.random() * height)];
         });
