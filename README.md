@@ -1,59 +1,87 @@
-# Currently Unmaintained
-
-Warning! This project is currently unmaintained. I started a rewrite of this project in 2016 but have been unable to return to it. No ETA at the moment, please feel free to fork or send pull requests.
-
 # Shatter.js
 
-Shatter.js provides simple image shattering by dividing a given
-image with a [Voronoi diagram](http://en.wikipedia.org/wiki/Voronoi_diagram).
+Shatter.js provides simple image shattering by dividing an image (DOM Image element) by an array of coordinates.
 
-Uses a custom build of [D3.js](https://github.com/mbostock/d3) to generate the Voronoi diagram used to split up the given image.
+It also includes a generator, to generate a random set of coordinates based on a [Voronoi diagram](http://en.wikipedia.org/wiki/Voronoi_diagram). The resulting array of images represents a 'shattered' version of the original image.
 
 ## Install
 
-Get dependencies:
+`npm install shatter`
 
-    $ bower install && npm install
+## Usage
 
-This will install d3.js (required for Voronoi generation) and
-smash (to build custom d3.js with Voronoi specific functions only).
+```
+const shattered = new Shatter('/img/square.png');
 
-## Build
+// Set up an array of 'pieces'
+// Each piece is an array of [x, y] coordinates
+shattered.setPieces([
+    [
+        [0, 0],
+        [50, 0],
+        [50, 100],
+        [0, 100],
+    ],
+    [
+        [50, 0],
+        [100, 0],
+        [100, 100],
+        [50, 100],
+    ],
+]);
 
-Build with grunt.
+// .shatter() returns a Promise due to the
+// image.src being asynchronous
+let result = await shattered.shatter();
 
-    $ grunt build
-
-This will create three files in ./build:
-
--   d3voronoi.js: d3 built specifically for voronoi generation
--   shatter.js: Includes Shatter and d3voronoi.js
--   shatter.min.js: Minified shatter.js.
-
-## Documentation
-
-Include shatter.min.js in your project.
-
-Create a new Shatter object. Pass in the image to shatter and the number of segments to split it into.
-
-    var image = new Image();
-    image.src = "aPictureOfSomethingCool.png";
-    var shattered = new Shatter(image, 10);
-
-Your new shattered object will contain images and x, y coordinates for each segment.
-shattered.images will be an array of objects (10 in this example) containing each segment and the x, y offsets.
-
-Each segment (i) will contain these useful properties:
-
--   shattered.images[i].image - The image segment
--   shattered.images[i].x - X-offset
--   shattered.images[i].y - Y-offset
-
-See the examples for more details!
+// result is an array of image pieces consisting of
+// { image: DOMImageElement, x: xOffset, y: yOffset }
+result.forEach((res, i) => {
+    container.appendChild(res.image);
+});
+```
 
 ## Examples
 
-See the [project page](http://cdgugler.github.io/shatter.js/).
+To run examples, clone repository and run:
+
+```
+npm install
+npm run buildexample
+npx http-server examples/
+```
+
+## API
+
+### Constructor
+
+`new Shatter(url)` - optional url of image to load. If not set, must use .setImage(image).
+
+### Methods
+
+| Name              | Description                                                                                                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| setImage(image)   | Provide a DOM Image element to shatter. Will override any image loaded from constructor.                                                                                 |
+| setPieces(pieces) | Provide an array of segments/pieces to split the image into. Each 'piece' is an array of [x,y] coordinates.                                                              |
+| shatter()         | Split the image using the provided coordinates. Returns a Promise that resolves with an array of 'shattered' objects containing the resulting images and additional data |
+
+### Shattered Object
+
+Shatter.shatter() returns an array of objects that contain images and x, y coordinates for each piece.
+
+-   result[i].image - The image segment as a DOM Image element
+-   result[i].x - X-offset
+-   result[i].y - Y-offset
+
+## Tests
+
+`npm run test` - run unit tests
+
+`npm run e2e` - run end to end tests
+
+## Live Demo
+
+See my post about the [project](https://www.addlime.com/posts/14/shatter-js/).
 
 ## License
 

@@ -1,10 +1,6 @@
 import loadImage from './lib/loadImage';
 import Bounds from './lib/Bounds';
 
-type ShatterOptions = {
-    numPieces?: number;
-};
-
 export type Coordinate = [number, number];
 
 export type Piece = Coordinate[];
@@ -17,14 +13,12 @@ type ShatteredImage = {
 
 class Shatter {
     url: string = '';
-    numPieces: number = 4;
     originalImage: HTMLImageElement | undefined;
     pieces: Piece[] = [];
     images: ShatteredImage[] = [];
 
-    constructor(url?: string, options?: ShatterOptions) {
+    constructor(url?: string) {
         this.url = url ? url : '';
-        this.numPieces = options?.numPieces ?? this.numPieces;
     }
 
     setImage(img: HTMLImageElement) {
