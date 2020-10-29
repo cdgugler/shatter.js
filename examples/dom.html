@@ -6,13 +6,14 @@
     <link rel="stylesheet" href="css/dom.css" type="text/css" media="screen" title="no title" charset="utf-8">
 </head>
 <body>
-<button class="new-shatter">Create Another!</button>
-<input type="text" name="numPieces" value="" id="numPieces" placeholder="Number of pieces" class="ignore">
-<button class="remove-all">Make them go away!</button>
-<a href="/shatter.js">Back to Shatter.js Project Page</a>
 <div class="container">
-    <div class="shatter">
-    </div>
+    <div class="js-original"></div>
+    <form>
+        <input type="text" value="" placeholder="Number of pieces" class="js-pieces" id="pieces" name="pieces" />
+        <button type="submit">Shatter Image</button>
+    </form>
+    <div class="js-result"></div>
+    <div class="assembled js-result-assembled"></div>
 </div>
 <script src="js/build/dom.js"></script>
 </body>

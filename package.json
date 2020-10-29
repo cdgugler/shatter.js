@@ -1,11 +1,13 @@
 {
   "name": "shatter",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "scripts": {
     "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && npm run buildexample",
     "buildexample": "parcel build examples/js/*.js -d examples/js/build/",
     "prepublishOnly": "npm run build",
     "test": "jest",
+    "e2e": "concurrently \"npx http-server examples/\" \"cypress open\"",
+    "e2eupdate": "concurrently \"npx http-server examples/\" \"cypress open --env updateSnapshots=true\"",
     "testreport": "npx http-server jest-screenshot-report/"
   },
   "main": "./dist/cjs/index.js",
@@ -14,13 +16,7 @@
     "dist/"
   ],
   "jest": {
-    "setupFilesAfterEnv": [
-      "./setup-framework.js"
-    ],
-    "reporters": [
-      "default",
-      "jest-screenshot/reporter"
-    ]
+    "rootDir": "./test/unit"
   },
   "browserslist": [
     "last 3 and_chr versions",
@@ -39,10 +35,16 @@
     "@babel/preset-typescript": "^7.12.1",
     "@types/jest": "^26.0.15",
     "babel-jest": "^26.6.1",
+    "concurrently": "^5.3.0",
+    "cypress": "^5.5.0",
+    "cypress-image-diff-js": "^1.6.0",
+    "cypress-image-snapshot": "^3.1.1",
     "fs-extra": "^9.0.1",
+    "http-server": "^0.12.3",
     "jest": "^26.6.1",
     "jest-screenshot": "^0.3.1",
     "parcel": "^1.12.4",
+    "prettier": "2.1.2",
     "typescript": "^4.0.5"
   }
 }

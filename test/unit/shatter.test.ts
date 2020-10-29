@@ -1,4 +1,4 @@
-import { Shatter } from "../src/index";
+import { Shatter } from "../../src/index";
 
 describe("Shatter Options", () => {
   it("generates 4 pieces by default", () => {

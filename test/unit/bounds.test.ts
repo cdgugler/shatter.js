@@ -1,4 +1,4 @@
-import Bounds from "../src/lib/Bounds";
+import Bounds from "../../src/lib/Bounds";
 
 describe("Bounds", () => {
   it("initializes values to coords when instantiated", () => {
