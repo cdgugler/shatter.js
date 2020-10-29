@@ -10,24 +10,27 @@ It also includes a generator, to generate a random set of coordinates based on a
 
 ## Usage
 
-```
+### Shatter
+
+``
+import { Shatter } from 'shatter';
 const shattered = new Shatter('/img/square.png');
 
 // Set up an array of 'pieces'
 // Each piece is an array of [x, y] coordinates
 shattered.setPieces([
-    [
-        [0, 0],
-        [50, 0],
-        [50, 100],
-        [0, 100],
-    ],
-    [
-        [50, 0],
-        [100, 0],
-        [100, 100],
-        [50, 100],
-    ],
+[
+[0, 0],
+[50, 0],
+[50, 100],
+[0, 100],
+],
+[
+[50, 0],
+[100, 0],
+[100, 100],
+[50, 100],
+],
 ]);
 
 // .shatter() returns a Promise due to the
@@ -37,8 +40,9 @@ let result = await shattered.shatter();
 // result is an array of image pieces consisting of
 // { image: DOMImageElement, x: xOffset, y: yOffset }
 result.forEach((res, i) => {
-    container.appendChild(res.image);
+container.appendChild(res.image);
 });
+
 ```
 
 ## Examples
@@ -46,9 +50,11 @@ result.forEach((res, i) => {
 To run examples, clone repository and run:
 
 ```
+
 npm install
 npm run buildexample
 npx http-server examples/
+
 ```
 
 ## API
@@ -73,6 +79,29 @@ Shatter.shatter() returns an array of objects that contain images and x, y coord
 -   result[i].x - X-offset
 -   result[i].y - Y-offset
 
+
+### Generators
+
+You might not want to manually come up with all the pieces with their individual x & y coordinates to shatter an image.
+
+Included is one generator, which uses [d3-voronoi](https://github.com/d3/d3-voronoi) behind the scenes to split an image into somewhat random pieces.
+
+To use the generator, call it with an options object consisting of the height and width of the image, and the number of pieces to generate.
+
+```
+
+import { VoronoiPieces } from 'shatter';
+
+const voropieces = VoronoiPieces({
+height: original.width,
+width: original.height,
+numPieces: num,
+});
+
+```
+
+Then pass the result into the `.setPieces()` method on Shatter.
+
 ## Tests
 
 `npm run test` - run unit tests
@@ -86,3 +115,4 @@ See my post about the [project](https://www.addlime.com/posts/14/shatter-js/).
 ## License
 
 -   [MIT license](LICENSE.md)
+```
