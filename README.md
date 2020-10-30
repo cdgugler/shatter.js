@@ -13,7 +13,7 @@ It also includes a generator, to generate a random set of coordinates based on a
 ### Shatter
 
 ```
-import { Shatter } from 'shatter';
+import { Shatter } from '@cdgugler/shatter';
 const shattered = new Shatter('/img/square.png');
 
 // Set up an array of 'pieces'
@@ -87,7 +87,7 @@ To use the generator, call it with an options object consisting of the height an
 
 ```
 
-import { VoronoiPieces } from 'shatter';
+import { VoronoiPieces } from '@cdgugler/shatter';
 
 const voropieces = VoronoiPieces({
     height: original.width,
