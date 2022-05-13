@@ -90,8 +90,8 @@ To use the generator, call it with an options object consisting of the height an
 import { VoronoiPieces } from '@cdgugler/shatter';
 
 const voropieces = VoronoiPieces({
-    height: original.width,
-    width: original.height,
+    height: original.height,
+    width: original.width,
     numPieces: num,
 });
 
